@@ -567,7 +567,77 @@ export function delayedReload() {
 
 let isDelayedReload = false;
 
-export type SettingsType = (ReturnType<typeof CITY_SETTINGS> & ReturnType<typeof DEV_SETTINGS> & OTHERSETTINGS);
+// **************************************************
+// ***************   ICON SETTINGS  **************** *
+// **************************************************
+
+/** Default icon paths configurable per item/actor type.
+ *  Keys follow the pattern: defaultIcon_<item|actor>_<type>
+ *  An empty string means "use Foundry's built-in default". */
+export function ICON_SETTINGS() {
+	const icon = (label: string, hint: string) => ({
+		name: label,
+		hint,
+		scope: "world" as const,
+		config: true,
+		type: String,
+		default: "",
+		restricted: true,
+	});
+	return {
+		// ── Item types ──────────────────────────────────────────────────────
+		"defaultIcon_item_theme": icon(
+			"Default Icon: Theme",
+			"Default icon path for newly created Theme items. Leave blank to use Foundry's default."),
+		"defaultIcon_item_themekit": icon(
+			"Default Icon: Theme Kit",
+			"Default icon path for newly created Theme Kit items."),
+		"defaultIcon_item_themebook": icon(
+			"Default Icon: Themebook",
+			"Default icon path for newly created Themebook items."),
+		"defaultIcon_item_tag": icon(
+			"Default Icon: Tag",
+			"Default icon path for newly created Tag items."),
+		"defaultIcon_item_improvement": icon(
+			"Default Icon: Improvement",
+			"Default icon path for newly created Improvement items."),
+		"defaultIcon_item_status": icon(
+			"Default Icon: Status",
+			"Default icon path for newly created Status items."),
+		"defaultIcon_item_spectrum": icon(
+			"Default Icon: Spectrum",
+			"Default icon path for newly created Spectrum items."),
+		"defaultIcon_item_clue": icon(
+			"Default Icon: Clue",
+			"Default icon path for newly created Clue items."),
+		"defaultIcon_item_juice": icon(
+			"Default Icon: Juice",
+			"Default icon path for newly created Juice items."),
+		"defaultIcon_item_move": icon(
+			"Default Icon: Move",
+			"Default icon path for newly created Move items."),
+		"defaultIcon_item_gmmove": icon(
+			"Default Icon: GM Move",
+			"Default icon path for newly created GM Move items."),
+		"defaultIcon_item_essence": icon(
+			"Default Icon: Essence",
+			"Default icon path for newly created Essence items."),
+		// ── Actor types ─────────────────────────────────────────────────────
+		"defaultIcon_actor_character": icon(
+			"Default Icon: Character (Actor)",
+			"Default icon path for newly created Character actors."),
+		"defaultIcon_actor_threat": icon(
+			"Default Icon: Threat (Actor)",
+			"Default icon path for newly created Threat actors."),
+		"defaultIcon_actor_crew": icon(
+			"Default Icon: Crew (Actor)",
+			"Default icon path for newly created Crew actors."),
+	} as const;
+}
+
+export type IconSettingsType = ReturnType<typeof ICON_SETTINGS>;
+
+export type SettingsType = (ReturnType<typeof CITY_SETTINGS> & ReturnType<typeof DEV_SETTINGS> & IconSettingsType & OTHERSETTINGS);
 
  type SettingsChoicesSub<R extends Record<string, SelectSettings<any>>, K extends keyof R> = R[K]["choices"] extends Record<string, any> ? keyof R[K]["choices"] : InstanceType<R[K]["type"]>;
 

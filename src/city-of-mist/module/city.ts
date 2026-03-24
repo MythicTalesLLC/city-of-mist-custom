@@ -52,6 +52,7 @@ import { CityCrewSheet } from "./city-crew-sheet.js";
 import { CityThreatSheet } from "./city-threat-sheet.js";
 import { CityCharacterSheet } from "./city-character-sheet.js";
 import { registerSystemSettings } from "./settings.js";
+import { CitySettings } from "./settings.js";
 import { StatusTrackerWindow } from "./city-status-tracker/city-status-tracker.js";
 import {} from "./tools/electron-fix.js";
 import {} from "./tools/debug.js";
@@ -167,6 +168,31 @@ Hooks.on("renderJournalDirectory", () => {
 	StatusTrackerWindow.init();
 	// window.statusTrackerWindow = new StatusTrackerWindow();
 });
+
+// ── Default icon mapping (MythicTales custom) ────────────────────────────────
+// When a new Item or Actor is created and has no custom icon, apply the
+// GM-configured default for that document type (set in System Settings).
+
+Hooks.on("preCreateItem", (item: CityItem, data: Record<string, unknown>) => {
+	const DEFAULT_ITEM_IMG = "icons/svg/item-bag.svg";
+	if (!data.img || data.img === DEFAULT_ITEM_IMG) {
+		const icon = CitySettings.getDefaultItemIcon(item.type);
+		if (icon) {
+			item.updateSource({ img: icon });
+		}
+	}
+});
+
+Hooks.on("preCreateActor", (actor: CityActor, data: Record<string, unknown>) => {
+	const DEFAULT_ACTOR_IMG = "icons/svg/mystery-man.svg";
+	if (!data.img || data.img === DEFAULT_ACTOR_IMG) {
+		const icon = CitySettings.getDefaultActorIcon(actor.type);
+		if (icon) {
+			actor.updateSource({ img: icon });
+		}
+	}
+});
+// ─────────────────────────────────────────────────────────────────────────────
 
 // Hooks.on("getSceneControlButtons", function(controls:any) {
 	//disabling status tracker as V13 didn't like it 

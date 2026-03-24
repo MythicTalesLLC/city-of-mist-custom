@@ -14,10 +14,14 @@ export async function registerSystemSettings() {
 	for (const [name, data] of Object.entries(DEV_SETTINGS())) {
 		game.settings.register<any>("city-of-mist", name, data);
 	}
+	for (const [name, data] of Object.entries(ICON_SETTINGS())) {
+		game.settings.register<any>("city-of-mist", name, data);
+	}
 }
 
 import { DEV_SETTINGS } from "./config/settings-object.js";
 import { CITY_SETTINGS } from "./config/settings-object.js";
+import { ICON_SETTINGS } from "./config/settings-object.js";
 
 import { SettingsType } from "./config/settings-object.js";
 
@@ -235,6 +239,28 @@ export class CitySettings {
 		// 		system satisfies never;
 		// 		return localize("CityOfMist.terms.loadoutTheme.name");
 		// }
+	}
+
+	/** Returns the configured default icon path for an item type,
+	 *  or an empty string if none has been set. */
+	static getDefaultItemIcon(itemType: string): string {
+		const key = `defaultIcon_item_${itemType}` as keyof SettingsType;
+		try {
+			return (game.settings.get("city-of-mist", key as any) as string) ?? "";
+		} catch (_e) {
+			return "";
+		}
+	}
+
+	/** Returns the configured default icon path for an actor type,
+	 *  or an empty string if none has been set. */
+	static getDefaultActorIcon(actorType: string): string {
+		const key = `defaultIcon_actor_${actorType}` as keyof SettingsType;
+		try {
+			return (game.settings.get("city-of-mist", key as any) as string) ?? "";
+		} catch (_e) {
+			return "";
+		}
 	}
 
 }
