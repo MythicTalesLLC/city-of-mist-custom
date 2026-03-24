@@ -230,6 +230,7 @@ export class CityDB extends DBAccessor {
 			case "wpIdnVs3F3Z2pSgX" : return "Adaptation";
 			case "0MISdMEFLyxmDpl4" : return "Bastion";
 			case "AKafVzAawzfJyfPE" : return "Conjuration";
+			case "xZcNJ8mKpLr4vB1w" : return "Conjunction"; // S&S Logos themebook
 			case "rSJ8sbrz2nQXKNTx" : return "Crew Theme";
 			case "G6U7gXAECea110Be" : return "Defining Event";
 			case "gP7G0S8vIhW95w0k" : return "Defining Relationship";

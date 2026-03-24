@@ -1,0 +1,79 @@
+import { CitySettings } from "../settings.js";
+import { localize } from "../city.js";
+import { MistEngineSystem } from "./mist-engine.js";
+const PATH = "systems/city-of-mist";
+export class LitMSystem extends MistEngineSystem {
+    get localizationStarterName() {
+        return "Legend";
+    }
+    get name() { return "legend"; }
+    get localizationString() { return localize("CityOfMist.settings.system.2"); }
+    themeTypes() {
+        return {
+            "Origin": {
+                localization: "Legend.terms.origin",
+                sortOrder: 1,
+                decreaseLocalization: "Legend.terms.abandon",
+                increaseLocalization: "Legend.terms.improve",
+                milestoneLocalization: "Legend.terms.milestone",
+                identityName: "Legend.terms.quest",
+            },
+            "Adventure": {
+                localization: "Legend.terms.adventure",
+                sortOrder: 2,
+                decreaseLocalization: "Legend.terms.abandon",
+                increaseLocalization: "Legend.terms.improve",
+                milestoneLocalization: "Legend.terms.milestone",
+                identityName: "Legend.terms.quest",
+            },
+            "Greatness": {
+                localization: "Legend.terms.greatness",
+                sortOrder: 3,
+                decreaseLocalization: "Legend.terms.abandon",
+                increaseLocalization: "Legend.terms.improve",
+                milestoneLocalization: "Legend.terms.milestone",
+                identityName: "Legend.terms.quest",
+            },
+            "Fellowship": {
+                localization: "Legend.terms.fellowship",
+                sortOrder: 10,
+                decreaseLocalization: "Legend.terms.abandon",
+                increaseLocalization: "Legend.terms.improve",
+                milestoneLocalization: "Legend.terms.milestone",
+                identityName: "Legend.terms.quest",
+                specials: ["crew"],
+            },
+            "Backpack": {
+                localization: "Legend.terms.loadoutTheme.name",
+                sortOrder: 100,
+                decreaseLocalization: "",
+                increaseLocalization: "",
+                identityName: "",
+                specials: ["loadout"],
+            }
+        };
+    }
+    headerTable = {
+        character: "systems/city-of-mist/templates/litm/pc-sheet-header.hbs",
+        threat: "",
+        crew: ""
+    };
+    async downtimeTemplate(actor) {
+        const templateData = { actor };
+        return await renderTemplate(`${PATH}/templates/dialogs/pc-downtime-chooser-otherscape.hbs`, templateData);
+    }
+    async onChangeTo() {
+        await super.onChangeTo();
+        const settings = CitySettings;
+        await settings.set("baseSystem", "legend");
+        await settings.set("system", "legend");
+        await settings.set("movesInclude", "legend");
+    }
+    gameTerms() {
+        return {
+            collective: "Legend.terms.collective",
+            buildUpPoints: "Legend.terms.promise",
+            evolution: "Legend.terms.fulfillment",
+        };
+    }
+}

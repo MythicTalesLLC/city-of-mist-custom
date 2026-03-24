@@ -1,0 +1,26 @@
+{
+	"Actor": {
+		"types": ["threat", "character","crew"],
+		"htmlFields": ["description"],
+		"threat": {},
+		"character": {},
+		"crew" :{}
+	},
+	"Item": {
+		"types": ["themebook", "tag", "improvement", "theme", "juice", "status", "clue", "move", "gmmove", "spectrum", "journal", "themekit", "essence"],
+		"htmlFields": ["description"],
+		"themebook":{},
+		"tag":{},
+		"improvement":{},
+		"theme":{},
+		"juice":{},
+		"status":{},
+		"clue":{},
+		"move": {},
+		"gmmove": {},
+		"spectrum":{},
+		"journal":{},
+		"themekit":{},
+		"essence": {}
+	}
+}

@@ -1,0 +1,243 @@
+import { HTMLTools } from "./tools/HTMLTools.js";
+import { CityDialogs } from "./city-dialogs.js";
+import { CityHelpers } from "./city-helpers.js";
+import { CityActorSheet } from "./city-actor-sheet.js";
+import { CityDB } from "./city-db.js";
+export class CityThreatSheet extends CityActorSheet {
+    /** @override */
+    static get defaultOptions() {
+        return foundry.utils.mergeObject(super.defaultOptions, {
+            classes: ["city", "sheet", "actor"],
+            template: "systems/city-of-mist/templates/threat-sheet.html",
+            width: 990,
+            height: 1070,
+            tabs: [{ navSelector: ".tabs", contentSelector: ".sheet-body", initial: "moves" }]
+        });
+    }
+    activateListeners(html) {
+        super.activateListeners(html);
+        //Everything below here is only needed if the sheet is editable
+        if (!this.options.editable) {
+            return;
+        }
+        html.find('.alias-input').on("focusout", ev => void this._aliasInput(ev));
+        html.find('.alias-input').on("change", ev => void this._aliasInput(ev));
+        html.find('.create-gm-move').on("click", ev => void this._createGMMove(ev));
+        html.find('.gm-moves-header').middleclick(ev => void this._createGMMove(ev));
+        html.find('.gmmove-delete').on("click", ev => void this._deleteGMMove(ev));
+        html.find('.gmmove-edit').on("click", ev => void this._editGMMove(ev));
+        html.find('.gmmove-select').on("click", ev => void this._selectGMMove(ev));
+        html.find('.gmmove-select').rightclick(ev => void this._editGMMove(ev));
+        html.find('.gmmove-select').middleclick(ev => void this._editGMMove(ev));
+        html.find('.create-spectrum').on("click", ev => void this._createSpectrum(ev));
+        html.find('.spectrum-editable').on("click", ev => void this._editSpectrum(ev));
+        html.find('.spectrum-delete').on("click", ev => void this._deleteSpectrum(ev));
+        html.find('.alias-input-unlinked-token').on("focusout", ev => void this._changeunlinkedtokenName(ev));
+        html.find('.alias-input-unlinked-token').change(ev => void this._changeunlinkedtokenName(ev));
+        html.find('.alias-input-unlinked-token').on("focusout", ev => void this._changeunlinkedtokenName(ev));
+        html.find('.alias-input-prototype').change(ev => void this._changelinkedtokenName(ev));
+        html.find('.template-add').on("click", ev => void this._addTemplate(ev));
+        html.find('.template-delete').on("click", ev => void this._deleteTemplate(ev));
+        html.find('.template-name').on("click", ev => void this._jumpToTemplate(ev));
+        html.find('.add-sub-move').on("click", ev => void this.#addSubMove(ev));
+    }
+    async getData() {
+        const data = await super.getData();
+        for (const gmmove of this.actor.gmmoves) {
+            if ("decryptData" in gmmove) 
+            //@ts-expect-error operation from external module
+            {
+                await gmmove.decryptData();
+            }
+        }
+        return data;
+    }
+    _getSubmitData(options) {
+        const data = super._getSubmitData(options);
+        const tokenCheck = foundry.utils.expandObject(data);
+        if (tokenCheck?.token?.name) {
+            const newName = tokenCheck.token.name;
+            if (!this.actor.token && this.actor.prototypeToken.name != newName) {
+                void this.actor.update({ "prototypeToken.name": newName });
+            }
+            for (const tok of this.actor.getLinkedTokens()) {
+                if (tok.name == newName) {
+                    continue;
+                }
+                console.debug(`Re-aliasing: ${newName}`);
+                void tok.update({ name: newName });
+            }
+        }
+        return data;
+    }
+    async _changelinkedtokenName(event) {
+        console.debug(`Alias change (linked)`);
+        const val = $(event.currentTarget).val();
+        if (val) {
+            for (const token of this.actor.getLinkedTokens()) {
+                if (token.name == val) {
+                    continue;
+                }
+                console.debug(`Re-aliasing: ${val}`);
+                await token.update({ name: val });
+                await this.render(false);
+            }
+        }
+        return true;
+    }
+    async _changeunlinkedtokenName(event) {
+        console.debug(`Alias change (unlinked)`);
+        const newName = $(event.currentTarget).val();
+        if (!this.actor.token && this.actor.prototypeToken.name != newName) {
+            await this.actor.update({ "prototypeToken.name": newName });
+        }
+        if (newName) {
+            const token = this.actor.token;
+            if (token && token.name != newName) {
+                console.debug(`Re-aliasing: ${newName}`);
+                await token.update({ name: newName });
+                await this.render(false);
+            }
+        }
+        return true;
+    }
+    async _createSpectrum(_event) {
+        const owner = this.actor;
+        const obj = await this.actor.createNewSpectrum("Unnamed Spectrum");
+        const spec = owner.getSpectrum(obj.id);
+        const updateObj = await CityDialogs.itemEditDialog(spec);
+        if (!updateObj) {
+            await owner.deleteSpectrum(obj.id);
+        }
+    }
+    async _editSpectrum(event) {
+        const owner = this.actor;
+        const id = HTMLTools.getClosestData(event, "spectrumId");
+        const spec = owner.getSpectrum(id);
+        await CityHelpers.itemDialog(spec);
+    }
+    async _deleteSpectrum(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const owner = this.actor;
+        const id = HTMLTools.getClosestData(event, "spectrumId");
+        const spec = owner.getSpectrum(id);
+        if (await this.confirmBox("Delete Status", `Delete ${spec?.name}`)) {
+            await owner.deleteSpectrum(id);
+        }
+    }
+    async _aliasInput(event) {
+        // event.stopImmediatePropagation();
+        const val = $(event.currentTarget).val();
+        await this.actor.setTokenName(val);
+    }
+    async _createGMMove(event) {
+        event.stopImmediatePropagation();
+        const owner = this.actor;
+        const obj = await this.actor.createNewGMMove("Unnamed Move");
+        const move = owner.getGMMove(obj.id);
+        await this.moveDialog(move);
+        // await move.updateGMMoveHTML();
+    }
+    async _deleteGMMove(event) {
+        event.stopImmediatePropagation();
+        const move_id = HTMLTools.getClosestData(event, "moveId");
+        if (!this.actor.ownsMove(move_id)) {
+            ui.notifications.warn("Can't delete this move, it's from another sheet");
+            return;
+        }
+        const actorId = HTMLTools.getClosestData(event, "ownerId");
+        const owner = this.getOwner(actorId);
+        const move = owner.getGMMove(move_id);
+        if (await this.confirmBox("Delete Move", `Delete ${move?.name}`)) {
+            await owner.deleteGMMove(move_id);
+        }
+    }
+    async _editGMMove(event) {
+        event.stopImmediatePropagation();
+        const move_id = HTMLTools.getClosestData(event, "moveId");
+        if (!this.actor.ownsMove(move_id)) {
+            return;
+        }
+        const ownerId = HTMLTools.getClosestData(event, "ownerId");
+        const owner = this.getOwner(ownerId);
+        const move = owner.getGMMove(move_id);
+        await this.moveDialog(move);
+        // await move.updateGMMoveHTML();
+    }
+    async _selectGMMove(event) {
+        event.stopImmediatePropagation();
+        const move_id = HTMLTools.getClosestData(event, "moveId");
+        const ownerId = HTMLTools.getClosestData(event, "ownerId");
+        const owner = this.getOwner(ownerId);
+        const move = owner.getGMMove(move_id);
+        if (!move) {
+            throw new Error(`Can't find move ${move_id} on ${owner.name}`);
+        }
+        await move.GMMovePopUp(this.actor);
+    }
+    async moveDialog(item) {
+        return await CityHelpers.itemDialog(item);
+    }
+    async _gmmoveRightMouseDown(event) {
+        if (event.which == 3) {
+            event.preventDefault();
+            await this._editGMMove(event);
+        }
+    }
+    async _addTemplate(_event) {
+        const inputList = CityHelpers.dangerTemplates
+            .filter(x => x != this.actor && !this.actor.hasTemplate(x.id))
+            .map(x => {
+            const name = x.name;
+            const data = [name];
+            return {
+                id: x.id, data, description: x.system.description
+            };
+        });
+        const choice = await HTMLTools.singleChoiceBox(inputList, "Choose Item");
+        if (!choice) {
+            return;
+        }
+        await this.actor.addTemplate(choice);
+    }
+    async _deleteTemplate(event) {
+        event.stopImmediatePropagation();
+        const id = HTMLTools.getClosestData(event, "templateId");
+        await this.actor.removeTemplate(id);
+    }
+    async _jumpToTemplate(event) {
+        event.stopImmediatePropagation();
+        const id = HTMLTools.getClosestData(event, "templateId");
+        const actors = CityHelpers.getAllActorsByType("threat");
+        await actors.find(x => x.id == id)?.sheet?.render(true);
+    }
+    //Override
+    async _onDropActor(_event, o) {
+        switch (o.type) {
+            case "Actor": {
+                const actor = CityDB.getActorById(o.id);
+                switch (actor.system.type) {
+                    case "threat":
+                        if (this.actor.hasTemplate(o.id)) {
+                            return;
+                        }
+                        await this.actor.addTemplate(o.id);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return undefined;
+    }
+    async #addSubMove(ev) {
+        const moveId = HTMLTools.getClosestData(ev, "moveId");
+        const move = this.actor.getGMMove(moveId);
+        if (!move) {
+            throw new Error(`Can't find Move id {$moveId}`);
+        }
+        const submove = await move.createSubMove();
+        await this.moveDialog(submove);
+    }
+} //end of class
