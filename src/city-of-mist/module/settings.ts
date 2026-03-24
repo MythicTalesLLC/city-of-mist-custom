@@ -27,18 +27,18 @@ import { SettingsType } from "./config/settings-object.js";
 
 
 export class CitySettings {
-	static async set<K extends keyof SettingNameSpace["city-of-mist"]>(settingField:K ,newvalue: SettingNameSpace["city-of-mist"][K]) {
+	static async set<K extends keyof SettingNameSpace["city-of-mist"]>(settingField: K, newvalue: SettingNameSpace["city-of-mist"][K]) {
 		await game.settings.set("city-of-mist", settingField, newvalue);
 	}
 
-	static get<K extends keyof SettingsType>(settingName : K ) : SettingsChoices<K> extends (string | Boolean | number) ? SettingsChoices<K> : never;
+	static get<K extends keyof SettingsType>(settingName: K): SettingsChoices<K> extends (string | Boolean | number) ? SettingsChoices<K> : never;
 
-	static get<K extends keyof SettingNameSpace["city-of-mist"]>(settingName : K ) : SettingNameSpace["city-of-mist"][K] {
+	static get<K extends keyof SettingNameSpace["city-of-mist"]>(settingName: K): SettingNameSpace["city-of-mist"][K] {
 		return game.settings.get('city-of-mist', settingName);
 	}
 
 	static deleteTemporaryStatuses() {
-		return this.get("handleTempItems") =="all";
+		return this.get("handleTempItems") == "all";
 	}
 
 	static isGritMode() {
@@ -50,11 +50,11 @@ export class CitySettings {
 	}
 
 	static burnTemporaryTags() {
-		return this.get("handleTempItems") !="none";
+		return this.get("handleTempItems") != "none";
 	}
 
 	static awardAttentionForWeakness() {
-		return (this.get("autoWeakness") ?? false ) == true;
+		return (this.get("autoWeakness") ?? false) == true;
 	}
 
 	static isAutoWeakness() {
@@ -74,7 +74,7 @@ export class CitySettings {
 	}
 
 	static getStatusAdditionSystem() {
-		const system= this.get("statusAdditionSystem");
+		const system = this.get("statusAdditionSystem");
 		switch (system) {
 			case "classic":
 			case "classic-commutative":
@@ -128,17 +128,17 @@ export class CitySettings {
 	}
 
 	static sceneTagWindowUsed() {
-		switch(this.get("sceneTagWindow" )) {
+		switch (this.get("sceneTagWindow")) {
 			case "none": return false;
 			default: return true;
 		}
 	}
 
-	static tagCreationPowerCost() : number {
+	static tagCreationPowerCost(): number {
 		return Number(this.get("tagCreationCost")) ?? 2;
 	}
 
-	static statusCreationPowerCost() : number {
+	static statusCreationPowerCost(): number {
 		return Number(this.get("statusCreationCost")) ?? 1;
 	}
 
@@ -225,7 +225,7 @@ export class CitySettings {
 		// }
 	}
 
-	static getLoadoutThemeName() : string {
+	static getLoadoutThemeName(): string {
 		return SystemModule.active.loadoutThemeName();
 		// const system = this.get("baseSystem");
 		// switch (system) {
@@ -272,11 +272,11 @@ export class CitySettings {
 
 function delayedReload() {
 	if (!isDelayedReload) {
-		const msg = localize("CityOfMist.notification.reloadRequired" );
+		const msg = localize("CityOfMist.notification.reloadRequired");
 		ui.notifications.notify(msg);
-		setTimeout(() =>  window.location.reload(), 4000);
+		setTimeout(() => window.location.reload(), 4000);
 	}
-	isDelayedReload= true;
+	isDelayedReload = true;
 }
 
 let isDelayedReload = false;

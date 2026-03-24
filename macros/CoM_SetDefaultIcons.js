@@ -41,18 +41,18 @@
 
     // ── Type → Icon path mapping ──────────────────────────────────────────────
     const TYPE_ICON_MAP = {
-        theme:        `${BASE_PATH}/theme.jpg`,
-        themekit:     `${BASE_PATH}/theme.jpg`,
-        themebook:    `${BASE_PATH}/themebook.jpg`,
-        tag:          `${BASE_PATH}/tags.jpg`,
-        improvement:  `${BASE_PATH}/improvements.jpg`,
-        status:       `${BASE_PATH}/status.jpg`,
-        spectrum:     `${BASE_PATH}/spectrum.jpg`,
-        clue:         `${BASE_PATH}/clues.jpg`,
-        juice:        `${BASE_PATH}/juice.jpg`,
-        move:         `${BASE_PATH}/player_moves.jpg`,
-        gmmove:       `${BASE_PATH}/gm_moves.jpg`,
-        essence:      `${BASE_PATH}/abilities.jpg`,
+        theme: `${BASE_PATH}/theme.jpg`,
+        themekit: `${BASE_PATH}/theme.jpg`,
+        themebook: `${BASE_PATH}/themebook.jpg`,
+        tag: `${BASE_PATH}/tags.jpg`,
+        improvement: `${BASE_PATH}/improvements.jpg`,
+        status: `${BASE_PATH}/status.jpg`,
+        spectrum: `${BASE_PATH}/spectrum.jpg`,
+        clue: `${BASE_PATH}/clues.jpg`,
+        juice: `${BASE_PATH}/juice.jpg`,
+        move: `${BASE_PATH}/player_moves.jpg`,
+        gmmove: `${BASE_PATH}/gm_moves.jpg`,
+        essence: `${BASE_PATH}/abilities.jpg`,
     };
 
     // ── Detect which system is active ─────────────────────────────────────────
@@ -68,18 +68,18 @@
     // ── Path: custom fork — write to persistent settings ─────────────────────
     if (useSettings) {
         const settingsMap = {
-            defaultIcon_item_theme:        TYPE_ICON_MAP.theme,
-            defaultIcon_item_themekit:     TYPE_ICON_MAP.themekit,
-            defaultIcon_item_themebook:    TYPE_ICON_MAP.themebook,
-            defaultIcon_item_tag:          TYPE_ICON_MAP.tag,
-            defaultIcon_item_improvement:  TYPE_ICON_MAP.improvement,
-            defaultIcon_item_status:       TYPE_ICON_MAP.status,
-            defaultIcon_item_spectrum:     TYPE_ICON_MAP.spectrum,
-            defaultIcon_item_clue:         TYPE_ICON_MAP.clue,
-            defaultIcon_item_juice:        TYPE_ICON_MAP.juice,
-            defaultIcon_item_move:         TYPE_ICON_MAP.move,
-            defaultIcon_item_gmmove:       TYPE_ICON_MAP.gmmove,
-            defaultIcon_item_essence:      TYPE_ICON_MAP.essence,
+            defaultIcon_item_theme: TYPE_ICON_MAP.theme,
+            defaultIcon_item_themekit: TYPE_ICON_MAP.themekit,
+            defaultIcon_item_themebook: TYPE_ICON_MAP.themebook,
+            defaultIcon_item_tag: TYPE_ICON_MAP.tag,
+            defaultIcon_item_improvement: TYPE_ICON_MAP.improvement,
+            defaultIcon_item_status: TYPE_ICON_MAP.status,
+            defaultIcon_item_spectrum: TYPE_ICON_MAP.spectrum,
+            defaultIcon_item_clue: TYPE_ICON_MAP.clue,
+            defaultIcon_item_juice: TYPE_ICON_MAP.juice,
+            defaultIcon_item_move: TYPE_ICON_MAP.move,
+            defaultIcon_item_gmmove: TYPE_ICON_MAP.gmmove,
+            defaultIcon_item_essence: TYPE_ICON_MAP.essence,
         };
         let saved = 0;
         for (const [key, val] of Object.entries(settingsMap)) {

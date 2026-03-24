@@ -6,7 +6,7 @@ import { SystemModule } from "./system-module.js";
 export type System = keyof ReturnType<typeof SYSTEM_CHOICES>;
 
 
-export function SYSTEM_CHOICES() : SYSTEM_NAMES {
+export function SYSTEM_CHOICES(): SYSTEM_NAMES {
 	return SystemModule.systemChoices();
 	// return {
 	// 	"city-of-mist": localize("CityOfMist.settings.system.0"),
@@ -55,7 +55,7 @@ export function CITY_SETTINGS() {
 			type: Number,
 			default: 9999,
 			choices: {
-				9999 : "None",
+				9999: "None",
 				3: "+3",
 				2: "+2",
 				1: "+1",
@@ -72,13 +72,13 @@ export function CITY_SETTINGS() {
 			type: String,
 			default: "tier-only",
 			choices: {
-				"tier-only" : localize("CityOfMist.settings.statusDisplay.0"),
+				"tier-only": localize("CityOfMist.settings.statusDisplay.0"),
 				"tier+pips": localize("CityOfMist.settings.statusDisplay.1"),
 				"tier+circles": localize("CityOfMist.settings.statusDisplay.2"),
 
 			},
 			restricted: false,
-			onChange: (_newval:string) => {
+			onChange: (_newval: string) => {
 			}
 		},
 
@@ -90,7 +90,7 @@ export function CITY_SETTINGS() {
 			type: Number,
 			default: 9999,
 			choices: {
-				9999 : "Unlimited",
+				9999: "Unlimited",
 				3: "3",
 				2: "2",
 				1: "1",
@@ -106,7 +106,7 @@ export function CITY_SETTINGS() {
 			type: Number,
 			default: 9999,
 			choices: {
-				9999 : "None",
+				9999: "None",
 				5: "+5",
 				4: "+4",
 				3: "+3",
@@ -163,7 +163,7 @@ export function CITY_SETTINGS() {
 			type: String,
 			default: "none",
 			choices: {
-				"none" : localize("CityOfMist.settings.execEntranceMoves.0"),
+				"none": localize("CityOfMist.settings.execEntranceMoves.0"),
 				"ask": localize("CityOfMist.settings.execEntranceMoves.1"),
 				"auto": localize("CityOfMist.settings.execEntranceMoves.2")
 			},
@@ -188,9 +188,9 @@ export function CITY_SETTINGS() {
 			type: String,
 			default: "alpha",
 			choices: {
-				"alpha" : localize("CityOfMist.settings.trackerSort.0"),
+				"alpha": localize("CityOfMist.settings.trackerSort.0"),
 				"pc_alpha": localize("CityOfMist.settings.trackerSort.1"),
-				"tag_sort":localize("CityOfMist.settings.trackerSort.2"),
+				"tag_sort": localize("CityOfMist.settings.trackerSort.2"),
 			},
 			restricted: true
 		},
@@ -225,13 +225,13 @@ export function CITY_SETTINGS() {
 			config: true,
 			type: String,
 			choices: {
-				"none" : localize("CityOfMist.settings.clueBoxes.0"),
+				"none": localize("CityOfMist.settings.clueBoxes.0"),
 				"whisper": localize("CityOfMist.settings.clueBoxes.1"),
-				"public":localize("CityOfMist.settings.clueBoxes.2"),
+				"public": localize("CityOfMist.settings.clueBoxes.2"),
 			},
 			default: "public",
 			restricted: true,
-			onChange: () =>	delayedReload()
+			onChange: () => delayedReload()
 		},
 
 		"gmmoveheaders": {
@@ -242,7 +242,7 @@ export function CITY_SETTINGS() {
 			type: String,
 			default: "none",
 			choices: {
-				"none" : localize("CityOfMist.settings.gmmoveheaders.choice0"),
+				"none": localize("CityOfMist.settings.gmmoveheaders.choice0"),
 				"symbols": localize("CityOfMist.settings.gmmoveheaders.choice1"),
 				"text": localize("CityOfMist.settings.gmmoveheaders.choice2")
 			},
@@ -277,7 +277,7 @@ export function CITY_SETTINGS() {
 			type: String,
 			default: "full",
 			choices: {
-				"none" : localize("CityOfMist.settings.sceneTagWindow.choice0"),
+				"none": localize("CityOfMist.settings.sceneTagWindow.choice0"),
 				"omitEmpty": localize("CityOfMist.settings.sceneTagWindow.choice1"),
 				"full": localize("CityOfMist.settings.sceneTagWindow.choice2")
 			},
@@ -296,7 +296,7 @@ export function CITY_SETTINGS() {
 			requiresReload: true,
 			restricted: false,
 			choices: {
-				"left" : localize("CityOfMist.settings.sceneTagWindowPosition.choice0"),
+				"left": localize("CityOfMist.settings.sceneTagWindowPosition.choice0"),
 				"right": localize("CityOfMist.settings.sceneTagWindowPosition.choice1"),
 				"hide": localize("CityOfMist.settings.sceneTagWindowPosition.choice2")
 			},
@@ -310,7 +310,7 @@ export function CITY_SETTINGS() {
 			type: String,
 			default: "all",
 			choices: {
-				"none" : localize("CityOfMist.settings.handleTempItems.choice0"),
+				"none": localize("CityOfMist.settings.handleTempItems.choice0"),
 				"tagOnly": localize("CityOfMist.settings.handleTempItems.choice1"),
 				"all": localize("CityOfMist.settings.handleTempItems.choice2")
 			},
@@ -348,7 +348,7 @@ export function CITY_SETTINGS() {
 // **************************************************
 
 
-function showDevSettings() : boolean {
+function showDevSettings(): boolean {
 	//@ts-ignore
 	return game.settings.get('city-of-mist', "system") == "custom";
 
@@ -366,7 +366,7 @@ export function DEV_SETTINGS() {
 			config: SHOW_DEV_SETTINGS,
 			type: String,
 			default: "city-of-mist",
-			choices: {...SYSTEM_CHOICES()},
+			choices: { ...SYSTEM_CHOICES() },
 			restricted: true,
 			onChange: (newval: string) => {
 				const curr = CitySettings.get("system");
@@ -442,13 +442,13 @@ export function DEV_SETTINGS() {
 			type: String,
 			default: "classic",
 			choices: {
-				"classic" : localize("CityOfMist.settings.statusAdditionSystem.0"),
+				"classic": localize("CityOfMist.settings.statusAdditionSystem.0"),
 				"classic-commutative": localize("CityOfMist.settings.statusAdditionSystem.1"),
 				"mist-engine": localize("CityOfMist.settings.statusAdditionSystem.3"),
 
 			},
 			restricted: true,
-			onChange: (_newval:string) => {
+			onChange: (_newval: string) => {
 				game.settings.set('city-of-mist', "system", "custom");
 			}
 		},
@@ -472,7 +472,7 @@ export function DEV_SETTINGS() {
 			type: String,
 			default: "classic",
 			choices: {
-				"classic" : localize("CityOfMist.settings.tagBurn.0"),
+				"classic": localize("CityOfMist.settings.tagBurn.0"),
 				"mist-engine": localize("CityOfMist.settings.tagBurn.1"),
 			},
 			restricted: true,
@@ -502,7 +502,7 @@ export function DEV_SETTINGS() {
 			type: String,
 			default: "city-of-mist",
 			choices: {
-				"city-of-mist" : localize("CityOfMist.settings.themeStyle.0"),
+				"city-of-mist": localize("CityOfMist.settings.themeStyle.0"),
 				"mist-engine": localize("CityOfMist.settings.themeStyle.1"),
 			},
 			restricted: true,
@@ -519,7 +519,7 @@ export function DEV_SETTINGS() {
 			type: String,
 			default: "city-of-mist",
 			choices: {
-				"city-of-mist" : localize("CityOfMist.settings.themeStyle.0"),
+				"city-of-mist": localize("CityOfMist.settings.themeStyle.0"),
 				"mist-engine": localize("CityOfMist.settings.themeStyle.1"),
 			},
 			restricted: true,
@@ -536,7 +536,7 @@ export function DEV_SETTINGS() {
 			type: Boolean,
 			default: false,
 			restricted: true,
-			onChange: (val:boolean) => {
+			onChange: (val: boolean) => {
 				DebugTools.setDebugMode(val);
 			},
 		},
@@ -558,11 +558,11 @@ export function DEV_SETTINGS() {
 
 export function delayedReload() {
 	if (!isDelayedReload) {
-		const msg = localize("CityOfMist.notification.reloadRequired" );
+		const msg = localize("CityOfMist.notification.reloadRequired");
 		ui.notifications.notify(msg);
-		setTimeout(() =>  window.location.reload(), 4000);
+		setTimeout(() => window.location.reload(), 4000);
 	}
-	isDelayedReload= true;
+	isDelayedReload = true;
 }
 
 let isDelayedReload = false;
@@ -639,7 +639,7 @@ export type IconSettingsType = ReturnType<typeof ICON_SETTINGS>;
 
 export type SettingsType = (ReturnType<typeof CITY_SETTINGS> & ReturnType<typeof DEV_SETTINGS> & IconSettingsType & OTHERSETTINGS);
 
- type SettingsChoicesSub<R extends Record<string, SelectSettings<any>>, K extends keyof R> = R[K]["choices"] extends Record<string, any> ? keyof R[K]["choices"] : InstanceType<R[K]["type"]>;
+type SettingsChoicesSub<R extends Record<string, SelectSettings<any>>, K extends keyof R> = R[K]["choices"] extends Record<string, any> ? keyof R[K]["choices"] : InstanceType<R[K]["type"]>;
 
 export type SettingsChoices<K extends keyof SettingsType> = SettingsChoicesSub<SettingsType, K>;
 
@@ -658,7 +658,7 @@ declare global {
 
 type CitySettingKeysBase = SettingsObjToSettingKeyType<SettingsType>;
 
-interface CitySettingKeys extends CitySettingKeysBase {};
+interface CitySettingKeys extends CitySettingKeysBase { };
 
 
 declare global {

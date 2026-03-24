@@ -4,7 +4,7 @@
  */
 
 declare global {
-		interface Game {
+	interface Game {
 		city: CITYDATA;
 	}
 
@@ -23,7 +23,7 @@ declare global {
 	}
 
 	interface HOOKS {
-		"registerRulesSystemPhase": (sys : typeof SystemModule) => unknown;
+		"registerRulesSystemPhase": (sys: typeof SystemModule) => unknown;
 	}
 }
 
@@ -41,28 +41,28 @@ import { MistRoll } from "./mist-roll.js";
 import { CityDataMigration } from "./migration.js";
 import { ACTORMODELS } from "./datamodel/actor-types.js";
 import { ITEMMODELS } from "./datamodel/item-types.js";
-import {TokenTooltip} from "./token-tooltip/token-tooltip.js";
+import { TokenTooltip } from "./token-tooltip/token-tooltip.js";
 import { preloadHandlebarsTemplates } from "./city-templates.js";
 import { CityRoll } from "./city-roll.js";
 import { CityHelpers } from "./city-helpers.js";
 import { CityActor } from "./city-actor.js";
 import { CityItem } from "./city-item.js";
-import { CityItemSheet , CityItemSheetSmall, CityItemSheetLarge} from "./city-item-sheet.js";
+import { CityItemSheet, CityItemSheetSmall, CityItemSheetLarge } from "./city-item-sheet.js";
 import { CityCrewSheet } from "./city-crew-sheet.js";
 import { CityThreatSheet } from "./city-threat-sheet.js";
 import { CityCharacterSheet } from "./city-character-sheet.js";
 import { registerSystemSettings } from "./settings.js";
 import { CitySettings } from "./settings.js";
 import { StatusTrackerWindow } from "./city-status-tracker/city-status-tracker.js";
-import {} from "./tools/electron-fix.js";
-import {} from "./tools/debug.js";
-import {EnhancedDirectory} from "./enhanced-directory/enhanced-directory.js";
-import {CityHandlebarsHelpers} from "./city-handlebars-helpers.js";
-import {CitySockets} from "./city-sockets.js";
-import {DragAndDrop} from "./dragAndDrop.js";
-import {CityKeyBinds} from "./keybindings.js";
-import {ClueChatCards } from "./clue-cards.js";
-import {StoryTagWindow} from "./story-tag-application.js";
+import { } from "./tools/electron-fix.js";
+import { } from "./tools/debug.js";
+import { EnhancedDirectory } from "./enhanced-directory/enhanced-directory.js";
+import { CityHandlebarsHelpers } from "./city-handlebars-helpers.js";
+import { CitySockets } from "./city-sockets.js";
+import { DragAndDrop } from "./dragAndDrop.js";
+import { CityKeyBinds } from "./keybindings.js";
+import { ClueChatCards } from "./clue-cards.js";
+import { StoryTagWindow } from "./story-tag-application.js";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -71,7 +71,7 @@ console.log("COM preinit");
 
 export function localize(str: string) {
 	if (!game?.i18n?.localize) {
-			console.log("Can't localize too early");
+		console.log("Can't localize too early");
 		return "";
 	}
 
@@ -87,7 +87,7 @@ Hooks.on('ready', () => {
 });
 
 
-Hooks.once("cityDBLoaded", function() {
+Hooks.once("cityDBLoaded", function () {
 	CityHelpers.applyColorization();
 	return true;
 });
@@ -99,8 +99,8 @@ Hooks.on("registerRulesSystemPhase", (sys) => {
 });
 
 function registerDataModels() {
-	CONFIG.Actor.dataModels= ACTORMODELS;
-	CONFIG.Item.dataModels= ITEMMODELS;
+	CONFIG.Actor.dataModels = ACTORMODELS;
+	CONFIG.Item.dataModels = ITEMMODELS;
 	CONFIG.Dice.rolls = [MistRoll];
 	//@ts-expect-error not in foundry types
 	CONFIG.ChatMessage.documentClass = MistChatMessage;
@@ -109,7 +109,7 @@ function registerDataModels() {
 
 Hooks.once("ready", () => CityHelpers.cacheSounds());
 
-Hooks.once("init", async function() {
+Hooks.once("init", async function () {
 	console.log(`***********************************`);
 	console.log(`Initializing City of Mist System`);
 	console.log(`***********************************`);
@@ -195,21 +195,21 @@ Hooks.on("preCreateActor", (actor: CityActor, data: Record<string, unknown>) => 
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Hooks.on("getSceneControlButtons", function(controls:any) {
-	//disabling status tracker as V13 didn't like it 
-	//TODO: fix later, not sure how many people use this feature
-	// let tileControls = controls.find((x:any) => x.name === "tokens");
-	// if (game.user.isGM){
-	// 	tileControls.tools.push({
-	// 		icon: "fas fa-medkit",
-	// 		name: "city-of-mist-status-tracker",
-	// 		title: game.i18n.localize("CityOfMistTracker.trackerwindow.title"),
-	// 		button: true,
-	// 		onClick: () => StatusTrackerWindow._instance.render(true)
-	// 	});
-	// }
+//disabling status tracker as V13 didn't like it 
+//TODO: fix later, not sure how many people use this feature
+// let tileControls = controls.find((x:any) => x.name === "tokens");
+// if (game.user.isGM){
+// 	tileControls.tools.push({
+// 		icon: "fas fa-medkit",
+// 		name: "city-of-mist-status-tracker",
+// 		title: game.i18n.localize("CityOfMistTracker.trackerwindow.title"),
+// 		button: true,
+// 		onClick: () => StatusTrackerWindow._instance.render(true)
+// 	});
+// }
 // });
 
-Hooks.on("renderApplication", function() {
+Hooks.on("renderApplication", function () {
 	if (StatusTrackerWindow._instance) {
 		StatusTrackerWindow._instance.render(false);
 	}
