@@ -22,13 +22,13 @@ Use this manifest URL when adding the system by manifest:
 
 This manifest expects a release asset at:
 
-`https://github.com/MythicTalesLLC/city-of-mist-custom/releases/download/v4.2.3/city-of-mist-custom.zip`
+`https://github.com/MythicTalesLLC/city-of-mist-custom/releases/download/v4.2.5/city-of-mist-ii.zip`
 
 To publish a release that Foundry and FoundryServer can install:
 
 1. Run `npm run package`
-2. Create a GitHub release with tag `v4.2.3`
-3. Upload `release/city-of-mist-custom.zip` as a release asset
+2. Create a GitHub release with the version tag from `src/city-of-mist/system.json`
+3. Upload `release/city-of-mist-ii.zip` as a release asset
 4. Push `main` so the manifest URL serves the updated `system.json`
 
 Foundry installs from a manifest by fetching the `download` URL from `system.json`, so both the manifest URL and the zip asset must be publicly reachable.
