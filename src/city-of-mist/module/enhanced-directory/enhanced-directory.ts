@@ -94,7 +94,7 @@ class EnhancedItemDirectory {
 		}
 
 		//@ts-ignore
-		ItemDirectory._entryPartial =  "systems/city-of-mist/module/enhanced-directory/enhanced-template.hbs";
+		ItemDirectory._entryPartial =  "systems/city-of-mist-ii/module/enhanced-directory/enhanced-template.hbs";
 
 		//@ts-ignore
 		ItemDirectory._sortAlphabetical = function (this: void, a: CityItem, b: CityItem) {
@@ -202,7 +202,7 @@ class EnhancedActorDirectory {
 		}
 
 		/// @ts-ignore
-		ActorDirectory._entryPartial =  "systems/city-of-mist/module/enhanced-directory/enhanced-template.hbs";
+		ActorDirectory._entryPartial =  "systems/city-of-mist-ii/module/enhanced-directory/enhanced-template.hbs";
 
 		//@ts-ignore
 		ActorDirectory.prototype._matchSearchEntries = function(query : string, entryIds :string[], folderIds: string[], autoExpandIds: boolean, options={}) {

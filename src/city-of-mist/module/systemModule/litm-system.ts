@@ -4,7 +4,7 @@ import { ThemeTypeInfo } from "./baseSystemModule.js";
 import { localize } from "../city.js";
 import { MistEngineSystem } from "./mist-engine.js";
 
-const PATH = "systems/city-of-mist";
+const PATH = "systems/city-of-mist-ii";
 
 export class LitMSystem extends MistEngineSystem {
 
@@ -63,7 +63,7 @@ export class LitMSystem extends MistEngineSystem {
 	}
 
 	headerTable = {
-		character: "systems/city-of-mist/templates/litm/pc-sheet-header.hbs",
+		character: "systems/city-of-mist-ii/templates/litm/pc-sheet-header.hbs",
 		threat: "",
 		crew: ""
 	}

@@ -1,13 +1,13 @@
 {
-  "name": "city-of-mist",
+  "name": "city-of-mist-ii",
   "version": "1.0.0",
   "description": "City of Mist system for Foundry VTT",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "sync:manifest": "cp src/city-of-mist/system.json system.json",
-    "build": "rm -rf dist && tsc && copyfiles -u 1 src/**/*.css src/**/*.json src/**/*.png src/**/*.webp src/**/*.html src/**/*.hbs src/**/*.mp3 src/**/*.wav src/**/*.otf src/**/*.woff2 src/**/*.ttf src/**/*.gif dist/ && copyfiles README.md dist/ && npm run sync:manifest",
-    "package": "npm run build && mkdir -p release && rm -f release/city-of-mist-custom.zip && cd dist && zip -qr ../release/city-of-mist-custom.zip city-of-mist"
+    "build": "rm -rf dist && tsc && copyfiles -u 1 src/**/*.css src/**/*.json src/**/*.png src/**/*.webp src/**/*.html src/**/*.hbs src/**/*.mp3 src/**/*.wav src/**/*.otf src/**/*.woff2 src/**/*.ttf src/**/*.gif dist/ && copyfiles README.md dist/ && mv dist/city-of-mist dist/city-of-mist-ii && npm run sync:manifest",
+    "package": "npm run build && mkdir -p release && rm -f release/city-of-mist-ii.zip && cd dist && zip -qr ../release/city-of-mist-ii.zip city-of-mist-ii"
   },
   "keywords": [
     "RPG",

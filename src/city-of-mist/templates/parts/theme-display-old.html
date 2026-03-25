@@ -125,8 +125,8 @@
 			{{/if}}
 		</div>
 	</div>
-	{{> "systems/city-of-mist/templates/parts/tag-list-display.hbs" itemlist=owner.items owner=owner locked=locked sheetowner=sheetowner canBurn=true subtype="power" themeId=theme.id supertag=""}}
-	{{> "systems/city-of-mist/templates/parts/tag-list-display.hbs" itemlist=owner.items owner=owner locked=owner.system.locked sheetowner=sheetowner canBurn=true subtype="weakness" themeId=theme.id supertag=""}}
+	{{> "systems/city-of-mist-ii/templates/parts/tag-list-display.hbs" itemlist=owner.items owner=owner locked=locked sheetowner=sheetowner canBurn=true subtype="power" themeId=theme.id supertag=""}}
+	{{> "systems/city-of-mist-ii/templates/parts/tag-list-display.hbs" itemlist=owner.items owner=owner locked=owner.system.locked sheetowner=sheetowner canBurn=true subtype="weakness" themeId=theme.id supertag=""}}
 		<div id="improvements-header" class="improvements-header"> {{localize 'CityOfMist.terms.improvements' }}
 			{{#if (gt theme.system.unspent_upgrades 0)}}
 			<a class="theme-create-improvement" data-distinct="true" data-item-type="improvement" data-duplicates="false" data-actor-id="{{owner.id}}" data-theme-id="{{theme.id}}" title= "Add Improvement"> <i class="fas fa-plus-square"></i></a>
@@ -141,7 +141,7 @@
 			{{#if (eq imp.type "improvement")}}
 			{{#if (eq imp.system.theme_id ../theme.id)}}
 			<li>
-				{{> "systems/city-of-mist/templates/parts/improvement-display.html" improvement=imp owner=../owner locked=../locked sheetowner=../sheetowner }}
+				{{> "systems/city-of-mist-ii/templates/parts/improvement-display.html" improvement=imp owner=../owner locked=../locked sheetowner=../sheetowner }}
 			</li>
 			{{/if}}
 			{{/if}}

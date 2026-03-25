@@ -446,7 +446,7 @@ export class CityHelpers {
 
 	static async sendNarratedMessage(text : string) {
 		const templateData = {text};
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/narration-box.html", templateData);
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/narration-box.html", templateData);
 		const speaker = { alias:"Narration" };
 		const messageData = {
 			speaker: speaker,
@@ -601,7 +601,7 @@ export class CityHelpers {
 				return;
 		}
 		moveText = localize(moveText);
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/pc-downtime-move.hbs", {actor, moveText});
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/pc-downtime-move.hbs", {actor, moveText});
 		const messageOptions = {};
 		const messageData : MessageData = {
 			// speaker: ChatMessage.getSpeaker(),
@@ -615,7 +615,7 @@ export class CityHelpers {
 	}
 
 	static applyColorization() {
-		// const colorsetting = game.settings.get("city-of-mist", "color-theme") ;
+		// const colorsetting = game.settings.get("city-of-mist-ii", "color-theme") ;
 		// if (colorsetting) {
 		// 	document.documentElement.style.setProperty(
 		// 		"--COM-COLOR-SCHEME",
@@ -650,13 +650,13 @@ export class CityHelpers {
 	}
 
 	static entranceMovesEnabled() {
-		const setting = game.settings.get("city-of-mist", "execEntranceMoves");
+		const setting = game.settings.get("city-of-mist-ii", "execEntranceMoves");
 		return setting != "none";
 	}
 
 
 	static autoExecEntranceMoves() {
-		const setting = game.settings.get("city-of-mist", "execEntranceMoves");
+		const setting = game.settings.get("city-of-mist-ii", "execEntranceMoves");
 		return setting == "auto";
 	}
 
@@ -693,7 +693,7 @@ export class CityHelpers {
 
 	static async _statusAddSubDialog(status: Status, title: string,_type : "addition" | "subtraction"  = "addition") : Promise<null | {name: string, tier: number}> {
 		const templateData = {status, data: status.system};
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/dialogs/status-addition-dialog.html", templateData);
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/dialogs/status-addition-dialog.html", templateData);
 		return new Promise ( (conf, _reject) => {
 			const options ={};
 			const returnfn = function (html: string, tier: number) {
@@ -799,21 +799,21 @@ export class CityHelpers {
 	static gmReviewEnabled() {
 		if (!game.users.contents.some( x=> x.isGM && x.active))
 			{return false;}
-		return game.settings.get('city-of-mist', "tagReview") ?? false;
+		return game.settings.get('city-of-mist-ii', "tagReview") ?? false;
 	}
 
 	static sceneTagWindowEnabled() {
-		const setting = game.settings.get('city-of-mist', "sceneTagWindow");
+		const setting = game.settings.get('city-of-mist-ii', "sceneTagWindow");
 		return setting != "none";
 	}
 
 	static sceneTagWindowFilterEmpty() {
-		const setting = game.settings.get('city-of-mist', "sceneTagWindow");
+		const setting = game.settings.get('city-of-mist-ii', "sceneTagWindow");
 		return setting == "omitEmpty";
 	}
 
 	static altPowerEnabled() {
-		return game.settings.get('city-of-mist', "altPower") ?? false;
+		return game.settings.get('city-of-mist-ii', "altPower") ?? false;
 	}
 
 	static async toggleTokensCombatState(tokens : Token<CityActor>[]) {

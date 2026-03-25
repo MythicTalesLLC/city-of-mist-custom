@@ -17,7 +17,7 @@ export class CityKeyBinds {
 	}
 
 	static init_narration() {
-		game.keybindings.register("city-of-mist", "narratorBox", {
+		game.keybindings.register("city-of-mist-ii", "narratorBox", {
 			name: localize("CityOfMist.keybinds.narration.name"),
 			hint: localize("CityOfMist.keybinds.narration.hint" ),
 			uneditable: [ ],
@@ -33,7 +33,7 @@ export class CityKeyBinds {
 	}
 
 	static init_downtime() {
-		game.keybindings.register("city-of-mist", "startDowntime", {
+		game.keybindings.register("city-of-mist-ii", "startDowntime", {
 			name: localize("CityOfMist.keybinds.startDowntime.name"),
 			hint: localize("CityOfMist.keybinds.startDowntime.hint" ),
 			uneditable: [ ],
@@ -50,7 +50,7 @@ export class CityKeyBinds {
 	}
 
 	static init_sessionEnd() {
-		game.keybindings.register("city-of-mist", "sessionEnd", {
+		game.keybindings.register("city-of-mist-ii", "sessionEnd", {
 			name: localize("CityOfMist.keybinds.sessionEnd.name"),
 			hint: localize("CityOfMist.keybinds.sessionEnd.hint" ),
 			uneditable: [ ],
@@ -67,7 +67,7 @@ export class CityKeyBinds {
 	}
 
 	static init_StoryTagHider() {
-		game.keybindings.register("city-of-mist", "hideStory", {
+		game.keybindings.register("city-of-mist-ii", "hideStory", {
 			name: localize("CityOfMist.keybinds.storyTagHider.name"),
 			hint: localize("CityOfMist.keybinds.storyTagHider.hint" ),
 			uneditable: [ ],

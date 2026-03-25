@@ -104,7 +104,7 @@
     },
     "motivation": "identity",
     "fade_type": "crack",
-    "system_compatiblity": "city-of-mist",
+    "system_compatiblity": "city-of-mist-ii",
     "locale_name": "#CityOfMist.themebook.tradition.name",
     "systemName": "Tradition"
   },
@@ -116,7 +116,7 @@
   },
   "flags": {},
   "_stats": {
-    "systemId": "city-of-mist",
+    "systemId": "city-of-mist-ii",
     "systemVersion": "3.1.4",
     "coreVersion": "13.345",
     "createdTime": 1715984792921,

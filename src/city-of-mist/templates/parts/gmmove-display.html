@@ -6,7 +6,7 @@
 		{{/if}}
 	</div>
 	<div class="gmmove-text">
-		{{> "systems/city-of-mist/templates/parts/gmmove-part.hbs" actor=sheetowner move=move showPrivate=true}}
+		{{> "systems/city-of-mist-ii/templates/parts/gmmove-part.hbs" actor=sheetowner move=move showPrivate=true}}
 		{{#each move.submoves as |submove|}}
 		<div class="submove" data-move-id="{{submove.id}}">
 			<div class="gm-move flex-row draggable {{#if ../locked}}gmmove-select {{else}} gmmove-edit{{/if}}" >
@@ -16,7 +16,7 @@
 					{{/if}}
 				</div>
 				<div class="gmmove-text">
-					{{> "systems/city-of-mist/templates/parts/gmmove-part.hbs" actor=../sheetowner move=submove showPrivate=true}}
+					{{> "systems/city-of-mist-ii/templates/parts/gmmove-part.hbs" actor=../sheetowner move=submove showPrivate=true}}
 				</div>
 			</div>
 		</div>

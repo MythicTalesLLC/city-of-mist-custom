@@ -19,7 +19,7 @@
     "abbreviation": "REVIEW",
     "subtype": "noroll",
     "theme_class": "",
-    "system_compatiblity": "city-of-mist"
+    "system_compatiblity": "city-of-mist-ii"
   },
   "effects": [],
   "ownership": {
@@ -30,7 +30,7 @@
     "core": {}
   },
   "_stats": {
-    "systemId": "city-of-mist",
+    "systemId": "city-of-mist-ii",
     "systemVersion": "2.7.1",
     "coreVersion": "13.345",
     "createdTime": 1683273715819,

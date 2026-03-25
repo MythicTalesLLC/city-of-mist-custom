@@ -12,7 +12,7 @@ export class CityLogger extends Logger {
 			const object_part = object ? `${object?.system?.type} ${object.getDisplayedName()}` : "";
 			const afterMsgString = Array.isArray(aftermsg) ? aftermsg.join(" ,") : aftermsg;
 			const after_message = afterMsgString ? `(${afterMsgString})` : "";
-			const message = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/modification-log-post.hbs", {object_part, after_message, actor, action});
+			const message = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/modification-log-post.hbs", {object_part, after_message, actor, action});
 			try { return await this.gmMessage(message, actor);}
 			catch (e) {console.error(e);}
 		} else {

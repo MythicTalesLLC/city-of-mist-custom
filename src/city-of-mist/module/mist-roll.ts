@@ -106,7 +106,7 @@ export class MistRoll extends Roll {
 	}
 
 	get showPowerPanel(): boolean {
-		if (CitySettings.getBaseSystem() == "city-of-mist") {
+		if (CitySettings.getBaseSystem() == "city-of-mist-ii") {
 			return true;
 		}
 		const o = this.options;

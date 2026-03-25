@@ -23,7 +23,7 @@ export class CityCharacterSheet extends CityActorSheet {
 	static override get defaultOptions() {
 		return foundry.utils.mergeObject(super.defaultOptions, {
 			classes: ["city", "sheet", "actor"],
-			template: "systems/city-of-mist/templates/actor-sheet.html",
+			template: "systems/city-of-mist-ii/templates/actor-sheet.html",
 			width: 990,
 			height: 1000,
 			tabs: [{navSelector: ".tabs", contentSelector: ".sheet-body", initial: "themes"}]
@@ -285,7 +285,7 @@ export class CityCharacterSheet extends CityActorSheet {
 
 	async monologue () {
 		if (!this.monologueDialog()) {return;}
-		if (!game.settings.get("city-of-mist", "monologueAttention"))
+		if (!game.settings.get("city-of-mist-ii", "monologueAttention"))
 			{return;}
 		const actor = this.actor;
 		const targetLevel = actor.getThemes().reduce( (acc, theme) => {
@@ -382,7 +382,7 @@ export class CityCharacterSheet extends CityActorSheet {
 		let BlazeThemeId : string | undefined = undefined;
 		if (SHB) {
 			const system = CitySettings.getBaseSystem();
-			if (system == "city-of-mist") {
+			if (system == "city-of-mist-ii") {
 				const SHBType = await CityDialogs.SHBDialog(this.actor);
 				if (!SHBType)
 					{return;}

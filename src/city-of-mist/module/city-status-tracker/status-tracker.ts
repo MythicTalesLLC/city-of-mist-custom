@@ -48,7 +48,7 @@ export class StatusTracker {
 			});
 		const combined = actors.concat(scene);
 		let sortFn = null;
-		switch ( game.settings.get("city-of-mist", "trackerSort")) {
+		switch ( game.settings.get("city-of-mist-ii", "trackerSort")) {
 			case "alpha":
 				sortFn = StatusTracker.alpha_sort;
 				break;

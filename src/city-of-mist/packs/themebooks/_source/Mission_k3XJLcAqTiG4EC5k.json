@@ -109,7 +109,7 @@
       }
     },
     "motivation": "identity",
-    "system_compatiblity": "city-of-mist",
+    "system_compatiblity": "city-of-mist-ii",
     "systemName": "Mission"
   },
   "ownership": {
@@ -117,7 +117,7 @@
     "vLgbC4k0egBgZMMz": 3
   },
   "_stats": {
-    "systemId": "city-of-mist",
+    "systemId": "city-of-mist-ii",
     "systemVersion": "3.1.4",
     "coreVersion": "13.345",
     "createdTime": null,

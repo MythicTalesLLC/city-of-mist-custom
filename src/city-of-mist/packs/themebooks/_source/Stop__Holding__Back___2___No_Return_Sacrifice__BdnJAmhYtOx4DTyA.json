@@ -24,7 +24,7 @@
     "category": "SHB",
     "effect_class": "",
     "abbreviation": "SHB2",
-    "system_compatiblity": "city-of-mist",
+    "system_compatiblity": "city-of-mist-ii",
     "subtype": "SHB",
     "theme_class": ""
   },
@@ -33,7 +33,7 @@
     "XObjulrAnIfZ284S": 3
   },
   "_stats": {
-    "systemId": "city-of-mist",
+    "systemId": "city-of-mist-ii",
     "systemVersion": "2.7.1",
     "coreVersion": "13.345",
     "createdTime": 1712594110605,

@@ -20,7 +20,7 @@ export class CityItemSheet extends ItemSheet<CityItem> {
 		static override get defaultOptions() {
 		const [width, height] = [600,500];
 		return foundry.utils.mergeObject(super.defaultOptions, {
-			classes: ["city-of-mist", "sheet", "item"],
+			classes: ["city-of-mist-ii", "sheet", "item"],
 			width,
 			height,
 			tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description"}]
@@ -76,7 +76,7 @@ export class CityItemSheet extends ItemSheet<CityItem> {
 
 	/** @override */
 	override get template() {
-		const path = "systems/city-of-mist/templates/items" as const;
+		const path = "systems/city-of-mist-ii/templates/items" as const;
 		const simple_item_types: string[] = [];
 		let template_name = `${this.item.type}`;
 		if (simple_item_types.indexOf(this.item.type) >= 0) {
@@ -338,7 +338,7 @@ export class CityItemSheetLarge extends CityItemSheet {
 	static override get defaultOptions() {
 		const [width, height] = [800, 1000];
 		return foundry.utils.mergeObject(super.defaultOptions, {
-			classes: ["city-of-mist", "sheet", "item"],
+			classes: ["city-of-mist-ii", "sheet", "item"],
 			width,
 			height,
 			tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description"}]
@@ -351,7 +351,7 @@ export class CityItemSheetSmall extends CityItemSheet {
 	static override get defaultOptions() {
 		const [width, height] = [600, 300 ];
 		return foundry.utils.mergeObject(super.defaultOptions, {
-			classes: ["city-of-mist", "sheet", "item"],
+			classes: ["city-of-mist-ii", "sheet", "item"],
 			width,
 			height,
 			tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description"}]

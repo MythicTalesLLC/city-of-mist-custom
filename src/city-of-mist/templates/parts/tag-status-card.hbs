@@ -1,13 +1,13 @@
 <div class="flip-card-inner {{setFlipped actor cardNum}}">
 	<div class="flip-card-front story-tag-box">
 		<div class="story-tags" >
-			{{> "systems/city-of-mist/templates/parts/story-tag-header.html" owner=actor  sheetowner=actor}}
+			{{> "systems/city-of-mist-ii/templates/parts/story-tag-header.html" owner=actor  sheetowner=actor}}
 
 			<div class="story-tag-category">
-				{{> "systems/city-of-mist/templates/parts/story-tag-list-display.html" canBurn=true taglist=actor.my_story_tags}}
+				{{> "systems/city-of-mist-ii/templates/parts/story-tag-list-display.html" canBurn=true taglist=actor.my_story_tags}}
 			</div>
 			<div class="relationship-tag-category">
-				{{> "systems/city-of-mist/templates/parts/relationship-tags-list-display.hbs" canBurn=false taglist=actor.relationshipTags}}
+				{{> "systems/city-of-mist-ii/templates/parts/relationship-tags-list-display.hbs" canBurn=false taglist=actor.relationshipTags}}
 			</div>
 		</div>
 		<div class="status-text-list">
@@ -18,11 +18,11 @@
 				</a>
 			</div>
 			<hr>
-			{{> "systems/city-of-mist/templates/parts/status-text-list.html" actor=actor}}
+			{{> "systems/city-of-mist-ii/templates/parts/status-text-list.html" actor=actor}}
 		</div>
 	</div>
 	<div class="flip-card-back story-tag-box">
-		{{> "systems/city-of-mist/templates/parts/build-up-section.hbs" actor=actor}}
+		{{> "systems/city-of-mist-ii/templates/parts/build-up-section.hbs" actor=actor}}
 	</div>
 </div>
 

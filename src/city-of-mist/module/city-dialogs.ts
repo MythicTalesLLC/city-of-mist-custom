@@ -28,7 +28,7 @@ import { CityHelpers } from "./city-helpers.js";
 import { HTMLTools } from "./tools/HTMLTools.js";
 import { TagReviewDialog } from "./dialogs/tag-review.js";
 
-const PATH = "systems/city-of-mist";
+const PATH = "systems/city-of-mist-ii";
 
 export class CityDialogs {
 
@@ -55,7 +55,7 @@ export class CityDialogs {
 		const themebooks = remduplicates.filter( x => !actorThemebooks.find( tb => tb && tb.name == x.name && !tb.name.includes("Crew")));
 		const templateData = {actor: actor, data: actor.system, themebooks};
 		const title = "Select Themebook";
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/dialogs/themebook-selector-dialog.html", templateData);
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/dialogs/themebook-selector-dialog.html", templateData);
 		return new Promise ( (conf, _reject) => {
 			const options = {};
 			const dialog = new Dialog({
@@ -122,7 +122,7 @@ export class CityDialogs {
 			tier,
 			name,
 		};
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/dialogs/merge-status-dialog.hbs", templateOptions);
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/dialogs/merge-status-dialog.hbs", templateOptions);
 		return new Promise ( (conf, _reject) => {
 			const dialog = new Dialog( {
 				title,
@@ -175,7 +175,7 @@ export class CityDialogs {
 		// const statusList = this.statusesAffectedByCategory(actor.my_statuses, options.category ?? "none", "both");
 		const statusList = actor.my_statuses;
 		const tier = options.tier;
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/dialogs/status-drop-dialog.hbs", {actor, statusList, options, name, tier, facedanger: options.faceDanger ?? false});
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/dialogs/status-drop-dialog.hbs", {actor, statusList, options, name, tier, facedanger: options.faceDanger ?? false});
 		return new Promise ( (conf, _reject) => {
 			const dialog = new Dialog({
 				title:`Add Dropped Status: ${name}`,
@@ -397,7 +397,7 @@ export class CityDialogs {
 		// const templateData = {actor};
 		// const system = CitySettings.getBaseSystem();
 		// switch (system) {
-		// 	case "city-of-mist":
+		// 	case "city-of-mist-ii":
 		// 		return await renderTemplate(`${PATH}/templates/dialogs/pc-downtime-chooser-com.hbs`, templateData);
 		// 	case "otherscape":
 		// 		return await renderTemplate(`${PATH}/templates/dialogs/pc-downtime-chooser-otherscape.hbs`, templateData);
@@ -451,7 +451,7 @@ export class CityDialogs {
 			...rollOptions};
 		let dynamiteAllowed = rollOptions.dynamiteAllowed;
 		const title = `Make Roll`;
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/dialogs/roll-modification-dialog.html", templateData);
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/dialogs/roll-modification-dialog.html", templateData);
 		return await  new Promise ( (conf, _reject) => {
 			const options = {};
 			const dialog = new Dialog({
@@ -518,7 +518,7 @@ static async getHelpHurt(dataObj: {actorId: string, actorName: string, moveId: s
 			move:  CityHelpers.getMoveById(moveId),
 			actor: CityDB.getActorById(actorId),
 		};
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/dialogs/get-help-hurt-initial.hbs", templateData);
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/dialogs/get-help-hurt-initial.hbs", templateData);
 		return await new Promise( (conf, reject) => {
 			const options ={};
 			const buttons : Record<string, ButtonOptions> = {
@@ -566,7 +566,7 @@ static async getHelpHurt(dataObj: {actorId: string, actorName: string, moveId: s
 		const templateData = {
 			HHMax
 		};
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/dialogs/get-help-hurt-selector.hbs", templateData);
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/dialogs/get-help-hurt-selector.hbs", templateData);
 		return await new Promise ( (conf, reject) => {
 			const options = {};
 			if (HHMax <= 0) {
@@ -728,7 +728,7 @@ static async getHelpHurt(dataObj: {actorId: string, actorName: string, moveId: s
 
 
 	static async downtimeGMMoveDialog(actorWithMovesList: {movelist: GMMove[], actor: CityActor}[]) : Promise<boolean> {
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/dialogs/downtime-GM-moves.hbs", {list : actorWithMovesList});
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/dialogs/downtime-GM-moves.hbs", {list : actorWithMovesList});
 		return await new Promise( (conf, _rej) => {
 			const options = {};
 			const dialog = new Dialog( {
@@ -762,7 +762,7 @@ static async getHelpHurt(dataObj: {actorId: string, actorName: string, moveId: s
 
 	static async SHBDialog (actor: PC): Promise<CRollOptions["newtype"] | null> {
 		const title = "You sure about this?";
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/dialogs/SHB-dialog.html", {actor});
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/dialogs/SHB-dialog.html", {actor});
 		return new Promise ( (conf, _rej) => {
 			const options = {};
 			const dialog = new Dialog({
@@ -797,7 +797,7 @@ static async getHelpHurt(dataObj: {actorId: string, actorName: string, moveId: s
 		const ACTOR_THEMES = Object.fromEntries(actor.getThemes()
 		.map( theme => [theme.id, theme.displayedName])
 	);
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/dialogs/Blaze-Dialog.hbs", {actor, ACTOR_THEMES});
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/dialogs/Blaze-Dialog.hbs", {actor, ACTOR_THEMES});
 		return new Promise ( (conf, _rej) => {
 			const options = {};
 			const dialog = new Dialog({

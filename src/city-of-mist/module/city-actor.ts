@@ -381,7 +381,7 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	async updateCollectiveStatus(this: Danger): Promise<void> {
 		const collective = this.collectiveStatus;
 		const useCollective = CitySettings.get("collectiveMechanics");
-		if (this.collective_size == 0 || useCollective == "city-of-mist") {
+		if (this.collective_size == 0 || useCollective == "city-of-mist-ii") {
 			const promises = collective.map(status => status.delete());
 			await Promise.allSettled(promises);
 			return;
@@ -742,7 +742,7 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	async deleteTheme(themeId: string, awardBU = true) {
 		const theme = this.getTheme(themeId);
 		if (!theme) { throw new Error(`Can't find theme ${themeId}`); }
-		await theme.setFlag("city-of-mist", "pendingDelete", true);
+		await theme.setFlag("city-of-mist-ii", "pendingDelete", true);
 		if (awardBU && this.system.type == "character") {
 			const BUV = theme.getBuildUpValue();
 			await (this as PC).incBuildUp(BUV);

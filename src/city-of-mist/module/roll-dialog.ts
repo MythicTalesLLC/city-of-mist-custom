@@ -243,7 +243,7 @@ export class RollDialog extends Dialog {
 			altPower,
 			sliderVal : this.#options.powerModifier ?? 0,
 		};
-		const templateHTML = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/dialogs/roll-dialog.html", templateData);
+		const templateHTML = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/dialogs/roll-dialog.html", templateData);
 		this.html.empty();
 		this.html.html(templateHTML);
 		this.setListeners(this.html);

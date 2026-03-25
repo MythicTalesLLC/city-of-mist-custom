@@ -25,7 +25,7 @@ export class CityActorSheet extends CitySheet {
 	static override get defaultOptions() {
 		return foundry.utils.mergeObject(super.defaultOptions, {
 			classes: ["city", "sheet", "actor"],
-			template: "systems/city-of-mist/templates/actor-sheet.html",
+			template: "systems/city-of-mist-ii/templates/actor-sheet.html",
 			width: 990,
 			height: 1070,
 			tabs: [{ navSelector: ".tabs", contentSelector: ".sheet-body", initial: "themes" }]
@@ -104,7 +104,7 @@ export class CityActorSheet extends CitySheet {
 
 	/** override */
 	override get template() {
-		if (!game.user.isGM && this.actor.limited) { return "systems/city-of-mist/templates/limited-actor.html"; }
+		if (!game.user.isGM && this.actor.limited) { return "systems/city-of-mist-ii/templates/limited-actor.html"; }
 		return this.options.template;
 	}
 
@@ -362,7 +362,7 @@ export class CityActorSheet extends CitySheet {
 		const imp = actor.getImprovement(impId)!;
 		const impName = imp.name;
 		const templateData = { improvement: imp, data: imp.system };
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/improvement-chat-description.html", templateData);
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/improvement-chat-description.html", templateData);
 		const uses = imp.getImprovementUses();
 		const uses_str = (uses < 9999) ? `(uses left ${uses})` : "";
 		const disable = (uses <= 0);

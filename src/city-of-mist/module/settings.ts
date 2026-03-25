@@ -9,13 +9,13 @@ export async function registerSystemSettings() {
 	console.log("Registering Settings");
 
 	for (const [name, data] of Object.entries(CITY_SETTINGS())) {
-		game.settings.register<any>("city-of-mist", name, data);
+		game.settings.register<any>("city-of-mist-ii", name, data);
 	}
 	for (const [name, data] of Object.entries(DEV_SETTINGS())) {
-		game.settings.register<any>("city-of-mist", name, data);
+		game.settings.register<any>("city-of-mist-ii", name, data);
 	}
 	for (const [name, data] of Object.entries(ICON_SETTINGS())) {
-		game.settings.register<any>("city-of-mist", name, data);
+		game.settings.register<any>("city-of-mist-ii", name, data);
 	}
 }
 
@@ -27,14 +27,14 @@ import { SettingsType } from "./config/settings-object.js";
 
 
 export class CitySettings {
-	static async set<K extends keyof SettingNameSpace["city-of-mist"]>(settingField: K, newvalue: SettingNameSpace["city-of-mist"][K]) {
-		await game.settings.set("city-of-mist", settingField, newvalue);
+	static async set<K extends keyof SettingNameSpace["city-of-mist-ii"]>(settingField: K, newvalue: SettingNameSpace["city-of-mist-ii"][K]) {
+		await game.settings.set("city-of-mist-ii", settingField, newvalue);
 	}
 
 	static get<K extends keyof SettingsType>(settingName: K): SettingsChoices<K> extends (string | Boolean | number) ? SettingsChoices<K> : never;
 
-	static get<K extends keyof SettingNameSpace["city-of-mist"]>(settingName: K): SettingNameSpace["city-of-mist"][K] {
-		return game.settings.get('city-of-mist', settingName);
+	static get<K extends keyof SettingNameSpace["city-of-mist-ii"]>(settingName: K): SettingNameSpace["city-of-mist-ii"][K] {
+		return game.settings.get('city-of-mist-ii', settingName);
 	}
 
 	static deleteTemporaryStatuses() {
@@ -161,7 +161,7 @@ export class CitySettings {
 
 	static async refreshSystem(system?: keyof ReturnType<typeof CITY_SETTINGS>["system"]["choices"]) {
 		if (!system) {
-			system = this.get("system") ?? "city-of-mist";
+			system = this.get("system") ?? "city-of-mist-ii";
 		}
 		switch (system) {
 			case "custom":
@@ -170,19 +170,19 @@ export class CitySettings {
 				await SystemModule.setActive(system);
 		}
 		// switch (system) {
-		// 	case "city-of-mist":
-		// 		// await this.set("baseSystem", "city-of-mist");
-		// 		// await this.set( "movesInclude", "city-of-mist");
+		// 	case "city-of-mist-ii":
+		// 		// await this.set("baseSystem", "city-of-mist-ii");
+		// 		// await this.set( "movesInclude", "city-of-mist-ii");
 		// 		// await this.set( "statusAdditionSystem", "classic");
 		// 		// await this.set("tagBurn", "classic");
 		// 		// await this.set("altPower", false);
 		// 		// await this.set("loadoutTheme", false);
-		// 		// await this.set("themeStyle", "city-of-mist");
+		// 		// await this.set("themeStyle", "city-of-mist-ii");
 		// 		// await this.set("autoFail_autoSuccess", false);
-		// 		// await this.set("collectiveMechanics", "city-of-mist");
+		// 		// await this.set("collectiveMechanics", "city-of-mist-ii");
 		// 		// await this.set("statusDisplay", "tier-only");
 
-		// 		// await this.set("system", "city-of-mist");
+		// 		// await this.set("system", "city-of-mist-ii");
 		// 		break;
 		// 	case "otherscape" :
 
@@ -229,7 +229,7 @@ export class CitySettings {
 		return SystemModule.active.loadoutThemeName();
 		// const system = this.get("baseSystem");
 		// switch (system) {
-		// 	case "city-of-mist":
+		// 	case "city-of-mist-ii":
 		// 		return localize("CityOfMist.terms.loadoutTheme.name");
 		// 	case "otherscape":
 		// 		return localize("Otherscape.terms.loadoutTheme.name");
@@ -246,7 +246,7 @@ export class CitySettings {
 	static getDefaultItemIcon(itemType: string): string {
 		const key = `defaultIcon_item_${itemType}` as keyof SettingsType;
 		try {
-			return (game.settings.get("city-of-mist", key as any) as string) ?? "";
+			return (game.settings.get("city-of-mist-ii", key as any) as string) ?? "";
 		} catch (_e) {
 			return "";
 		}
@@ -257,7 +257,7 @@ export class CitySettings {
 	static getDefaultActorIcon(actorType: string): string {
 		const key = `defaultIcon_actor_${actorType}` as keyof SettingsType;
 		try {
-			return (game.settings.get("city-of-mist", key as any) as string) ?? "";
+			return (game.settings.get("city-of-mist-ii", key as any) as string) ?? "";
 		} catch (_e) {
 			return "";
 		}
@@ -268,7 +268,7 @@ export class CitySettings {
 
 
 // Example Getter
-// game.settings.get('city-of-mist', "weaknessCap");
+// game.settings.get('city-of-mist-ii', "weaknessCap");
 
 function delayedReload() {
 	if (!isDelayedReload) {

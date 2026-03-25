@@ -2,10 +2,10 @@
 	<div class="themebook-name flip-button"> {{theme.themebook.displayedName}}</div>
 
 	<div class="att-fade-section">
-		{{> "systems/city-of-mist/templates/parts/themePointControls.hbs" theme=theme locked=locked themePointType="attention" }}
-		{{> "systems/city-of-mist/templates/parts/themePointControls.hbs" theme=theme locked=locked themePointType="crack" }}
+		{{> "systems/city-of-mist-ii/templates/parts/themePointControls.hbs" theme=theme locked=locked themePointType="attention" }}
+		{{> "systems/city-of-mist-ii/templates/parts/themePointControls.hbs" theme=theme locked=locked themePointType="crack" }}
 		{{#if (useMilestoneTrack theme)}}
-		{{> "systems/city-of-mist/templates/parts/themePointControls.hbs" theme=theme locked=locked themePointType="milestone" }}
+		{{> "systems/city-of-mist-ii/templates/parts/themePointControls.hbs" theme=theme locked=locked themePointType="milestone" }}
 		{{/if}}
 	</div>
 
@@ -22,7 +22,7 @@
 		<ul class="improvement-list">
 			{{#each (getImprovements theme) as |imp |}}
 			<li>
-				{{> "systems/city-of-mist/templates/parts/improvement-display.html" improvement=imp owner=../owner locked=../locked sheetowner=../sheetowner }}
+				{{> "systems/city-of-mist-ii/templates/parts/improvement-display.html" improvement=imp owner=../owner locked=../locked sheetowner=../sheetowner }}
 			</li>
 			{{/each}}
 		</ul>

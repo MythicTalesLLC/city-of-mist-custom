@@ -93,7 +93,7 @@ export class TagReviewDialog extends EnhancedDialog {
 			actor: this.#actor,
 			suggestions: this.getSuggestedList()
 		};
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/dialogs/tag-review.hbs", templateData);
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/dialogs/tag-review.hbs", templateData);
 		this.setHTML(html);
 		this.setListeners(html);
 	}

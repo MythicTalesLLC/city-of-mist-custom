@@ -21,7 +21,7 @@ export class ClueChatCards {
 			{console.warn("No metasource for clue");}
 		if (!actor)
 			{throw new Error(`Couldnt find actor Id ${templateData?.actorId}`);}
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/parts/clue-reveal.hbs", templateData);
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/parts/clue-reveal.hbs", templateData);
 		await CityLogger.sendToChat2(html, {actor: actor.id});
 	}
 
@@ -41,7 +41,7 @@ export class ClueChatCards {
 		const	templateData = {question, method, source, actorId, partial_clue, metaSource, messageId, ...newdata};
 		if (!metaSource)
 			{console.warn("No metasource for clue");}
-		const new_html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/parts/clue-reveal.hbs", templateData);
+		const new_html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/parts/clue-reveal.hbs", templateData);
 		const user = message?.user;
 		try {
 			if (!message) {
@@ -120,7 +120,7 @@ export class ClueChatCards {
 		if (!message) {
 			throw new Error("Can't find message");
 		}
-		const new_html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/parts/clue-reveal.hbs", {banked:true});
+		const new_html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/parts/clue-reveal.hbs", {banked:true});
 		const msg = await  message.update( {content: new_html});
 		await ui.chat.updateMessage( msg, false);
 		await actor.createClue(metaSource, clueData);

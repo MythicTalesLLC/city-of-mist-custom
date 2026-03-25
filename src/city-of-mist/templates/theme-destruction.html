@@ -9,7 +9,7 @@
 	<ul class="tag-list">
 		{{#each tags as |tag tid|}}
 		<li>
-			{{> "systems/city-of-mist/templates/parts/tag-display.html" tag=tag owner=../owner locked=true sheetowner=null canBurn=false}}
+			{{> "systems/city-of-mist-ii/templates/parts/tag-display.html" tag=tag owner=../owner locked=true sheetowner=null canBurn=false}}
 		</li>
 		{{/each}}
 	</ul>
@@ -17,7 +17,7 @@
 	<ul class="improvement-list">
 		{{#each improvements as |imp tid|}}
 		<li>
-			{{> "systems/city-of-mist/templates/parts/improvement-display.html" improvement=imp owner=../owner locked=true sheetowner=null}}
+			{{> "systems/city-of-mist-ii/templates/parts/improvement-display.html" improvement=imp owner=../owner locked=true sheetowner=null}}
 		</li>
 		{{/each}}
 	</ul>

@@ -16,7 +16,7 @@ export class CitySockets {
 	static sockets: SocketInterface;
 
 	static init() {
-		this.sockets = new SocketInterface("system.city-of-mist");
+		this.sockets = new SocketInterface("system.city-of-mist-ii");
 		this.sockets.addSlaveSessionConstructor(JuiceMasterSession, JuiceSlaveSession);
 		this.sockets.addSlaveSessionConstructor(JuiceSpendingSessionM, JuiceSpendingSessionS);
 		this.sockets.addSlaveSessionConstructor(TagReviewMasterSession, TagReviewSlaveSession);

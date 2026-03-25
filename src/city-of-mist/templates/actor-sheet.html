@@ -12,7 +12,7 @@
 		</div>
 		<div class="flex-row">
 			<div class="lock-button">
-				{{> "systems/city-of-mist/templates/parts/lock-button.html" data=data actor=actor}}
+				{{> "systems/city-of-mist-ii/templates/parts/lock-button.html" data=data actor=actor}}
 			</div>
 			<div>
 				<a class="open-tutorial" title="{{localize 'General.info.openDocumentation'}}">
@@ -118,15 +118,15 @@
 				{{/if}}
 				<div class="flip-card flex-theme-block-flip" data-card-id="{{actor.loadoutCardId}}">
 					{{#if (loadoutThemeEnabled)}}
-					{{> "systems/city-of-mist/templates/parts/loadout-theme.hbs" actor=actor theme=actor.loadout
+					{{> "systems/city-of-mist-ii/templates/parts/loadout-theme.hbs" actor=actor theme=actor.loadout
 					cardNum=actor.loadoutCardId}}
 					{{else}}
-					{{> "systems/city-of-mist/templates/parts/juice-clues-card.hbs" owner=actor sheetowner=actor
+					{{> "systems/city-of-mist-ii/templates/parts/juice-clues-card.hbs" owner=actor sheetowner=actor
 					cardNum=actor.loadoutCardId}}
 					{{/if}}
 				</div>
 				<div class="flip-card flex-theme-block-flip " data-card-id="{{actor.tagStatusCardId}}">
-					{{> "systems/city-of-mist/templates/parts/tag-status-card.hbs" actor=actor
+					{{> "systems/city-of-mist-ii/templates/parts/tag-status-card.hbs" actor=actor
 					cardNum=actor.tagStatusCardId }}
 
 				</div>
@@ -142,7 +142,7 @@
 				<div class="flex-row-left">
 					{{#each (getJuiceList actor) as |item id|}}
 					{{#if (eq item.type "juice")}}
-					{{> "systems/city-of-mist/templates/parts/juice-display.html" owner=../actor
+					{{> "systems/city-of-mist-ii/templates/parts/juice-display.html" owner=../actor
 					locked=../actor.system.locked sheetowner=../actor juice=item}}
 					{{/if}}
 					{{/each}}
@@ -156,7 +156,7 @@
 				</div>
 				<div class="flex-row-left">
 					{{#each (getHelpList actor) as |item id|}}
-					{{> "systems/city-of-mist/templates/parts/juice-display.html" owner=../actor
+					{{> "systems/city-of-mist-ii/templates/parts/juice-display.html" owner=../actor
 					locked=../actor.system.locked sheetowner=../actor juice=item}}
 					{{/each}}
 				</div>
@@ -169,7 +169,7 @@
 				</div>
 				<div class="flex-row-left">
 					{{#each (getHurtList actor) as |item id|}}
-					{{> "systems/city-of-mist/templates/parts/juice-display.html" owner=../actor
+					{{> "systems/city-of-mist-ii/templates/parts/juice-display.html" owner=../actor
 					locked=../actor.system.locked sheetowner=../actor juice=item}}
 					{{/each}}
 				</div>
@@ -184,19 +184,19 @@
 				</div>
 				{{#each items as |item id|}}
 				{{#if (eq item.type "clue")}}
-				{{> "systems/city-of-mist/templates/parts/clue-display.html" owner=../actor
+				{{> "systems/city-of-mist-ii/templates/parts/clue-display.html" owner=../actor
 				locked=../actor.system.locked sheetowner=../actor clue=item data=item.system}}
 				{{/if}}
 				{{/each}}
 				<hr>
 				{{#each actor.clueJournal as |journal|}}
-				{{> "systems/city-of-mist/templates/parts/clue-journal-display.html" owner=../actor
+				{{> "systems/city-of-mist-ii/templates/parts/clue-journal-display.html" owner=../actor
 				locked=../actor.system.locked sheetowner=../actor clue=journal data=journal.system}}
 				{{/each}}
 			</section>
 		</div>
 		<div class="tab tab-content flexcol space-between bio-section" data-group="primary" data-tab="bio">
-			{{> "systems/city-of-mist/templates/parts/bio-display.html" actor=actor data=data locked=actor.system.locked
+			{{> "systems/city-of-mist-ii/templates/parts/bio-display.html" actor=actor data=data locked=actor.system.locked
 			sheetowner=actor owner=isOwner}}
 		</div>
 	</section>

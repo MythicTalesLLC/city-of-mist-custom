@@ -13,12 +13,12 @@
 	{{/if}}
 	{{#each owner.gmmoves as |item id|}}
 	{{#if (eq item.system.subtype "entrance")}}
-	{{> "systems/city-of-mist/templates/parts/gmmove-display.html"  move=item locked=../locked sheetowner=../actor }}
+	{{> "systems/city-of-mist-ii/templates/parts/gmmove-display.html"  move=item locked=../locked sheetowner=../actor }}
 	{{/if}}
 	{{/each}}
 	{{#each owner.gmmoves as |item id|}}
 	{{#if (eq item.system.subtype "intrusion")}}
-	{{> "systems/city-of-mist/templates/parts/gmmove-display.html" move=item locked=../locked sheetowner=../actor }}
+	{{> "systems/city-of-mist-ii/templates/parts/gmmove-display.html" move=item locked=../locked sheetowner=../actor }}
 	{{/if}}
 	{{/each}}
 	{{#if (hasGMMoveOfType owner "custom")}}
@@ -28,7 +28,7 @@
 	{{/if}}
 	{{#each owner.gmmoves as |item|}}
 	{{#if (eq item.system.subtype "custom")}}
-	{{> "systems/city-of-mist/templates/parts/gmmove-display.html"  move=item locked=../locked sheetowner=../actor }}
+	{{> "systems/city-of-mist-ii/templates/parts/gmmove-display.html"  move=item locked=../locked sheetowner=../actor }}
 	{{/if}}
 	{{/each}}
 	{{#if (hasGMMoveOfType owner "downtime")}}
@@ -38,7 +38,7 @@
 	{{/if}}
 	{{#each owner.gmmoves as |item|}}
 	{{#if (eq item.system.subtype "downtime")}}
-	{{> "systems/city-of-mist/templates/parts/gmmove-display.html"  move=item locked=../locked sheetowner=../actor }}
+	{{> "systems/city-of-mist-ii/templates/parts/gmmove-display.html"  move=item locked=../locked sheetowner=../actor }}
 	{{/if}}
 	{{/each}}
 	{{#if (hasGMMoveOfType owner "hard")}}
@@ -48,7 +48,7 @@
 	{{/if}}
 	{{#each owner.gmmoves as |item|}}
 	{{#if (eq item.system.subtype "hard")}}
-	{{> "systems/city-of-mist/templates/parts/gmmove-display.html"  move=item locked=../locked sheetowner=../actor }}
+	{{> "systems/city-of-mist-ii/templates/parts/gmmove-display.html"  move=item locked=../locked sheetowner=../actor }}
 	{{/if}}
 	{{/each}}
 	{{#if (hasGMMoveOfType owner "soft")}}
@@ -58,7 +58,7 @@
 	{{/if}}
 	{{#each owner.gmmoves as |item|}}
 	{{#if (eq item.system.subtype "soft")}}
-	{{> "systems/city-of-mist/templates/parts/gmmove-display.html"  move=item locked=../locked sheetowner=../actor }}
+	{{> "systems/city-of-mist-ii/templates/parts/gmmove-display.html"  move=item locked=../locked sheetowner=../actor }}
 	{{/if}}
 	{{/each}}
 

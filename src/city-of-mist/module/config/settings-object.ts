@@ -9,7 +9,7 @@ export type System = keyof ReturnType<typeof SYSTEM_CHOICES>;
 export function SYSTEM_CHOICES(): SYSTEM_NAMES {
 	return SystemModule.systemChoices();
 	// return {
-	// 	"city-of-mist": localize("CityOfMist.settings.system.0"),
+	// 	"city-of-mist-ii": localize("CityOfMist.settings.system.0"),
 	// 	"otherscape": localize("CityOfMist.settings.system.1"),
 	// 	"legend": localize("CityOfMist.settings.system.2"),
 	// } as const;
@@ -23,10 +23,10 @@ export function CITY_SETTINGS() {
 			scope: "world",
 			config: true,
 			type: String,
-			default: "city-of-mist",
+			default: "city-of-mist-ii",
 			choices: {
 				...SYSTEM_CHOICES(),
-				// "city-of-mist": localize("CityOfMist.settings.system.0"),
+				// "city-of-mist-ii": localize("CityOfMist.settings.system.0"),
 				// "otherscape": localize("CityOfMist.settings.system.1"),
 				// "legend": localize("CityOfMist.settings.system.2"),
 				"custom": localize("CityOfMist.settings.system.3"),
@@ -350,7 +350,7 @@ export function CITY_SETTINGS() {
 
 function showDevSettings(): boolean {
 	//@ts-ignore
-	return game.settings.get('city-of-mist', "system") == "custom";
+	return game.settings.get('city-of-mist-ii', "system") == "custom";
 
 }
 
@@ -365,7 +365,7 @@ export function DEV_SETTINGS() {
 			//@ts-ignore
 			config: SHOW_DEV_SETTINGS,
 			type: String,
-			default: "city-of-mist",
+			default: "city-of-mist-ii",
 			choices: { ...SYSTEM_CHOICES() },
 			restricted: true,
 			onChange: (newval: string) => {
@@ -419,10 +419,10 @@ export function DEV_SETTINGS() {
 			scope: "world",
 			config: SHOW_DEV_SETTINGS,
 			type: String,
-			default: "city-of-mist",
+			default: "city-of-mist-ii",
 			choices: {
 				...SYSTEM_CHOICES(),
-				// "city-of-mist": localize("CityOfMist.settings.system.0"),
+				// "city-of-mist-ii": localize("CityOfMist.settings.system.0"),
 				// "otherscape": localize("CityOfMist.settings.system.1"),
 				// "legend": localize("CityOfMist.settings.system.2"),
 				"none": localize("CityOfMist.settings.movesInclude.none"),
@@ -449,7 +449,7 @@ export function DEV_SETTINGS() {
 			},
 			restricted: true,
 			onChange: (_newval: string) => {
-				game.settings.set('city-of-mist', "system", "custom");
+				game.settings.set('city-of-mist-ii', "system", "custom");
 			}
 		},
 
@@ -477,7 +477,7 @@ export function DEV_SETTINGS() {
 			},
 			restricted: true,
 			onChange: () => {
-				game.settings.set('city-of-mist', "system", "custom");
+				game.settings.set('city-of-mist-ii', "system", "custom");
 			}
 		},
 
@@ -490,7 +490,7 @@ export function DEV_SETTINGS() {
 			default: false,
 			restricted: true,
 			onChange: () => {
-				game.settings.set('city-of-mist', "system", "custom");
+				game.settings.set('city-of-mist-ii', "system", "custom");
 			}
 		},
 
@@ -500,14 +500,14 @@ export function DEV_SETTINGS() {
 			scope: "world",
 			config: SHOW_DEV_SETTINGS,
 			type: String,
-			default: "city-of-mist",
+			default: "city-of-mist-ii",
 			choices: {
-				"city-of-mist": localize("CityOfMist.settings.themeStyle.0"),
+				"city-of-mist-ii": localize("CityOfMist.settings.themeStyle.0"),
 				"mist-engine": localize("CityOfMist.settings.themeStyle.1"),
 			},
 			restricted: true,
 			onChange: () => {
-				game.settings.set('city-of-mist', "system", "custom");
+				game.settings.set('city-of-mist-ii', "system", "custom");
 			}
 		},
 
@@ -517,14 +517,14 @@ export function DEV_SETTINGS() {
 			scope: "world",
 			config: SHOW_DEV_SETTINGS,
 			type: String,
-			default: "city-of-mist",
+			default: "city-of-mist-ii",
 			choices: {
-				"city-of-mist": localize("CityOfMist.settings.themeStyle.0"),
+				"city-of-mist-ii": localize("CityOfMist.settings.themeStyle.0"),
 				"mist-engine": localize("CityOfMist.settings.themeStyle.1"),
 			},
 			restricted: true,
 			onChange: () => {
-				game.settings.set('city-of-mist', "system", "custom");
+				game.settings.set('city-of-mist-ii', "system", "custom");
 			}
 		},
 
@@ -663,7 +663,7 @@ interface CitySettingKeys extends CitySettingKeysBase { };
 
 declare global {
 	interface SettingNameSpace {
-		"city-of-mist": CitySettingKeys,
+		"city-of-mist-ii": CitySettingKeys,
 	}
 }
 

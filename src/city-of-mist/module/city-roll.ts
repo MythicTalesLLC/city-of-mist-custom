@@ -309,7 +309,7 @@ export class CityRoll {
 			powerAdjustment: adjustment,
 			rollAdjustment: roll_adjustment,
 		};
-		return await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/city-roll.hbs", templateData);
+		return await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/city-roll.hbs", templateData);
 	}
 
 	static getTotal (roll : MistRoll) {
@@ -839,7 +839,7 @@ export class CityRoll {
 		const move = CityHelpers.getMoves().find(x=> x.id == roll.options.moveId)!;
 		const roll_status = CityRoll.getRollStatus(roll, total, roll.options);
 		const moveListRaw = CityItem.generateMoveList(move, roll_status, power).map ( x=> {x.checked = false; return x;});
-		let moveList = message.getFlag<typeof moveListRaw>("city-of-mist", "checkedOptions") ??
+		let moveList = message.getFlag<typeof moveListRaw>("city-of-mist-ii", "checkedOptions") ??
 			moveListRaw;
 		const listitem = HTMLTools.getClosestData(event, "origtext");
 		let item = moveList.find( x=> x.origText === listitem);
@@ -883,7 +883,7 @@ export class CityRoll {
 			console.warn("invalid choice");
 			return false;
 		}
-		await message.setFlag("city-of-mist", "checkedOptions", moveList);
+		await message.setFlag("city-of-mist-ii", "checkedOptions", moveList);
 		return await CityRoll._updateMessage(messageId);
 	}
 
@@ -934,7 +934,7 @@ export class CityRoll {
 		const roll = newRoll ?? message.rolls[0];
 		try {
 			const checkedOptions = this.verifyCheckedOptions(
-				message.getFlag("city-of-mist", "checkedOptions")!,
+				message.getFlag("city-of-mist-ii", "checkedOptions")!,
 				roll
 			);
 			let newContent;

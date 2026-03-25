@@ -4,7 +4,7 @@
 		{{#if (eq character.type 'threat')}}enemy-status{{/if}}" >
 		<div class="other-status-list">
 			{{#each character.my_statuses as |status id|}}
-			{{> "systems/city-of-mist/templates/parts/status-with-controls.hbs" status=status sheetowner=../../sheetowner owner=status.parent locked=true}}
+			{{> "systems/city-of-mist-ii/templates/parts/status-with-controls.hbs" status=status sheetowner=../../sheetowner owner=status.parent locked=true}}
 			{{/each}}
 		</div>
 		</div>

@@ -1,6 +1,6 @@
 {
-	"id": "city-of-mist",
-	"title": "City of Mist / Mist Engine",
+	"id": "city-of-mist-ii",
+	"title": "City of Mist II",
 	"description": "Unofficial City of Mist RPG system as well as providing limited support for other Mist Engine games like Otherscape and Legend in the Mist",
 	"authors": [
 		{
@@ -10,7 +10,7 @@
 		}
 	],
 	"url": "https://github.com/MythicTalesLLC/city-of-mist-custom",
-	"version": "4.2.3",
+	"version": "4.2.4",
 	"compatibility": {
 		"minimum": "13",
 		"verified": "13.351",
@@ -76,7 +76,7 @@
 		{
 			"name": "themebook",
 			"label": "CoM Data",
-			"system": "city-of-mist",
+			"system": "city-of-mist-ii",
 			"path": "packs/themebooks",
 			"type": "Item",
 			"private": false,
@@ -85,7 +85,7 @@
 		{
 			"name": "sampleDangers",
 			"label": "Sample Dangers",
-			"system": "city-of-mist",
+			"system": "city-of-mist-ii",
 			"path": "packs/sampledangers",
 			"type": "Actor",
 			"private": false,
@@ -94,7 +94,7 @@
 		{
 			"name": "macro",
 			"label": "Macros",
-			"system": "city-of-mist",
+			"system": "city-of-mist-ii",
 			"path": "packs/macro",
 			"type": "Macro",
 			"private": false,
@@ -103,7 +103,7 @@
 		{
 			"name": "journal",
 			"label": "CoM/Mist System Documentation",
-			"system": "city-of-mist",
+			"system": "city-of-mist-ii",
 			"path": "packs/documentation",
 			"type": "JournalEntry",
 			"private": false,
@@ -112,5 +112,5 @@
 	],
 	"socket": true,
 	"manifest": "https://raw.githubusercontent.com/MythicTalesLLC/city-of-mist-custom/main/system.json",
-	"download": "https://github.com/MythicTalesLLC/city-of-mist-custom/releases/download/v4.2.3/city-of-mist-custom.zip"
+	"download": "https://github.com/MythicTalesLLC/city-of-mist-custom/releases/download/v4.2.4/city-of-mist-ii.zip"
 }

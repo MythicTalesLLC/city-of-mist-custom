@@ -664,7 +664,7 @@ export class CityItem extends Item<typeof ITEMMODELS, CityActor, ActiveEffect<Ci
 		const templateData = {
 			BUGenerated, owner: this.parent, theme: this, tags: tagdata, improvements: impdata, BUImpGained
 		};
-		const manifest = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/theme-destruction.html", templateData );
+		const manifest = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/theme-destruction.html", templateData );
 		return manifest.replaceAll("\n", "");
 	}
 
@@ -1420,7 +1420,7 @@ export class CityItem extends Item<typeof ITEMMODELS, CityActor, ActiveEffect<Ci
 			});
 		} else {
 			const templateData = {actor: this.parent, clue: this};
-			const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/parts/clue-use-no-card.hbs", templateData);
+			const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/parts/clue-use-no-card.hbs", templateData);
 			await CityLogger.sendToChat2(html, {actor: this.parent?.id});
 
 		}
@@ -1525,7 +1525,7 @@ export class CityItem extends Item<typeof ITEMMODELS, CityActor, ActiveEffect<Ci
 	async prepareToRenderGMMove(this: GMMove, actor = this.parent) {
 		//TODO: X substitution
 		if (! actor) {throw new Error(`No parent for GMMove ${this.name}`);}
-		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist/templates/parts/gmmove-part.hbs" , { actor, move: this});
+		const html = await foundry.applications.handlebars.renderTemplate("systems/city-of-mist-ii/templates/parts/gmmove-part.hbs" , { actor, move: this});
 		const {taglist, statuslist} = this.formatGMMoveText(actor as Danger);
 		const options = { token: null ,
 			speaker: {
@@ -1754,7 +1754,7 @@ export class CityItem extends Item<typeof ITEMMODELS, CityActor, ActiveEffect<Ci
 	}
 
 	isBeingDeleted(): boolean {
-		return this.getFlag("city-of-mist", "pendingDelete") == true;
+		return this.getFlag("city-of-mist-ii", "pendingDelete") == true;
 	}
 
 	static numIndexToLetter(index: number): string {
@@ -1802,7 +1802,7 @@ export class CityItem extends Item<typeof ITEMMODELS, CityActor, ActiveEffect<Ci
 	canCreateTags(this: Move): boolean {
 		return SystemModule.active.canCreateTags(this);
 		//switch( this.system.system_compatiblity) {
-		//	case "city-of-mist":
+		//	case "city-of-mist-ii":
 		//		//TODO: May fix this later, but given the breadth of moves that can create things, some through dynamite results, it's best to just allow it for everything.
 		//		return true;
 		//	case "otherscape":

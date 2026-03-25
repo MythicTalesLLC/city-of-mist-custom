@@ -125,7 +125,7 @@ export class CityDB extends DBAccessor {
 		let movesList = this.filterItemsByType("move") as Move[];
 		movesList = this.filterOverridedContent(movesList);
 		movesList = movesList.filter(x => x.system.category == movetype);
-		const include = CitySettings.get("movesInclude") ?? "city-of-mist";
+		const include = CitySettings.get("movesInclude") ?? "city-of-mist-ii";
 		return movesList.filter(x => x.isSystemCompatible(include));
 	}
 

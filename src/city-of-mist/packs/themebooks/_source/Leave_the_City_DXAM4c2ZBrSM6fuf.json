@@ -19,7 +19,7 @@
     "theme_id": null,
     "effect_class": "",
     "chosen": false,
-    "system_compatiblity": "city-of-mist"
+    "system_compatiblity": "city-of-mist-ii"
   },
   "ownership": {
     "default": 0,
@@ -28,7 +28,7 @@
   },
   "folder": "s47vGIGtyXE1QUAS",
   "_stats": {
-    "systemId": "city-of-mist",
+    "systemId": "city-of-mist-ii",
     "systemVersion": "2.7.1",
     "coreVersion": "13.345",
     "createdTime": 1712593948735,

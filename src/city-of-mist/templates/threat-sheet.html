@@ -4,11 +4,11 @@
 			<img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}">
 		</div>
 		<div class="character-basic-info">
-			{{> "systems/city-of-mist/templates/parts/threat-sheet-header.html" locked=actor.system.locked sheetowner=actor actor=actor items=items}}
+			{{> "systems/city-of-mist-ii/templates/parts/threat-sheet-header.html" locked=actor.system.locked sheetowner=actor actor=actor items=items}}
 		</div>
 		<div class="lock-container flex-col no-overflow">
 			<div class="lock-button">
-				{{> "systems/city-of-mist/templates/parts/lock-button.html" actor=actor}}
+				{{> "systems/city-of-mist-ii/templates/parts/lock-button.html" actor=actor}}
 			</div>
 			<div>
 				<a class="open-tutorial" title="{{localize 'General.info.openDocumentation'}}">
@@ -36,7 +36,7 @@
 		</div>
 		<div class="spectrum-list">
 			{{#each actor.my_spectrums as |spectrum id|}}
-			{{> "systems/city-of-mist/templates/parts/spectrum-display.html" spectrum=spectrum owner=../actor locked=../actor.system.locked sheetowner=actor }}
+			{{> "systems/city-of-mist-ii/templates/parts/spectrum-display.html" spectrum=spectrum owner=../actor locked=../actor.system.locked sheetowner=actor }}
 			{{/each}}
 		</div>
 	</section>
@@ -60,15 +60,15 @@
 		<div class="tab tab-content" data-group="primary" data-tab="moves">
 			<div class="flex-row">
 				<div class="flex-overview-block">
-					{{> "systems/city-of-mist/templates/parts/gmmoves-section.hbs" owner=actor locked=actor.system.locked sheetowner=actor}}
-					{{> "systems/city-of-mist/templates/parts/danger-template.html" owner=actor locked=actor.system.locked sheetowner=actor actor=actor}}
+					{{> "systems/city-of-mist-ii/templates/parts/gmmoves-section.hbs" owner=actor locked=actor.system.locked sheetowner=actor}}
+					{{> "systems/city-of-mist-ii/templates/parts/danger-template.html" owner=actor locked=actor.system.locked sheetowner=actor actor=actor}}
 				</div>
 				<div class="flex-column">
 					<div class="flip-card-front story-tag-box">
 						<div class="story-tags" >
-							{{> "systems/city-of-mist/templates/parts/story-tag-header.html" owner=actor  sheetowner=actor}}
+							{{> "systems/city-of-mist-ii/templates/parts/story-tag-header.html" owner=actor  sheetowner=actor}}
 							<div class="story-tag-category">
-								{{> "systems/city-of-mist/templates/parts/story-tag-list-display.html" canBurn=true taglist=actor.my_story_tags}}
+								{{> "systems/city-of-mist-ii/templates/parts/story-tag-list-display.html" canBurn=true taglist=actor.my_story_tags}}
 							</div>
 						</div>
 						<div class="status-text-list">
@@ -78,14 +78,14 @@
 								</a>
 							</div>
 							<hr>
-							{{> "systems/city-of-mist/templates/parts/status-text-list.html" actor=actor}}
+							{{> "systems/city-of-mist-ii/templates/parts/status-text-list.html" actor=actor}}
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		<div class="tab tab-content" data-group="primary" data-tab="bio">
-			{{> "systems/city-of-mist/templates/parts/bio-display.html" actor=actor locked=actor.system.locked sheetowner=actor owner=owner}}
+			{{> "systems/city-of-mist-ii/templates/parts/bio-display.html" actor=actor locked=actor.system.locked sheetowner=actor owner=owner}}
 		</div>
 		<div class="tab tab-content" data-group="primary" data-tab="themes">
 			<section id="theme-section" class="theme-section">
@@ -101,14 +101,14 @@
 				<div class="theme-block-group">
 					{{#each actor.mainThemes as |item i|}}
 					<div class="flip-card flex-theme-block-flip" data-card-id="{{i}}">
-						{{> "systems/city-of-mist/templates/parts/theme-display.html" owner=../actor theme=item locked=../actor.system.locked sheetowner=../actor themetype="character" data=item.system themebook=item.themebook tbdata=item.themebook.system cardNum=i}}
+						{{> "systems/city-of-mist-ii/templates/parts/theme-display.html" owner=../actor theme=item locked=../actor.system.locked sheetowner=../actor themetype="character" data=item.system themebook=item.themebook tbdata=item.themebook.system cardNum=i}}
 					</div>
 					{{/each}}
 					<div class="flex-theme-block status-box" >
-						{{> "systems/city-of-mist/templates/parts/status-text-list.html" owner=actor locked=actor.system.locked sheetowner=actor}}
+						{{> "systems/city-of-mist-ii/templates/parts/status-text-list.html" owner=actor locked=actor.system.locked sheetowner=actor}}
 					</div>
 					<div class="flex-theme-block story-tag-box" >
-						{{> "systems/city-of-mist/templates/parts/story-tag-display.html" owner=actor locked=false sheetowner=actor canBurn=true taglist=storyTags}}
+						{{> "systems/city-of-mist-ii/templates/parts/story-tag-display.html" owner=actor locked=false sheetowner=actor canBurn=true taglist=storyTags}}
 					</div>
 				</div>
 			</section>

@@ -133,7 +133,7 @@ Hooks.once("init", async function () {
 
 	await preloadHandlebarsTemplates();
 
-	if (game.settings.get("city-of-mist", "enhancedActorDirectory")) {
+	if (game.settings.get("city-of-mist-ii", "enhancedActorDirectory")) {
 		EnhancedDirectory.init();
 	}
 	CityHandlebarsHelpers.init();

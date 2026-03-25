@@ -22,7 +22,7 @@
     "chosen": false,
     "choice_type": "",
     "effect_class": "ALWAYS_DYN_HIT",
-    "system_compatiblity": "city-of-mist"
+    "system_compatiblity": "city-of-mist-ii"
   },
   "ownership": {
     "default": 0,
@@ -30,7 +30,7 @@
     "XObjulrAnIfZ284S": 3
   },
   "_stats": {
-    "systemId": "city-of-mist",
+    "systemId": "city-of-mist-ii",
     "systemVersion": "2.7.1",
     "coreVersion": "13.345",
     "createdTime": 1712593934596,

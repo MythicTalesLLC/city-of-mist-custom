@@ -11,11 +11,11 @@ import { CityActor, PC } from "../city-actor.js";
 import { Theme } from "../city-item.js";
 import { MistEngineSystem } from "./mist-engine.js";
 
-const PATH = "systems/city-of-mist";
+const PATH = "systems/city-of-mist-ii";
 
 export class OtherscapeSystem extends MistEngineSystem {
 
-	protected override themeCardTemplate = "systems/city-of-mist/templates/otherscape/theme-card.hbs";
+	protected override themeCardTemplate = "systems/city-of-mist-ii/templates/otherscape/theme-card.hbs";
 
 	override get localizationStarterName() {
 		return "Otherscape" as const;
@@ -30,7 +30,7 @@ export class OtherscapeSystem extends MistEngineSystem {
 	get localizationString() { return localize("CityOfMist.settings.system.1");}
 
 	headerTable = {
-		character: "systems/city-of-mist/templates/otherscape/pc-sheet-header.hbs",
+		character: "systems/city-of-mist-ii/templates/otherscape/pc-sheet-header.hbs",
 		threat: "",
 		crew: ""
 	}
@@ -148,7 +148,7 @@ export class OtherscapeSystem extends MistEngineSystem {
 	override async activate() {
 		super.activate();
 		for (const [name, data] of Object.entries(this.systemSettings())) {
-			game.settings.register("city-of-mist", name, data);
+			game.settings.register("city-of-mist-ii", name, data);
 		}
 	}
 

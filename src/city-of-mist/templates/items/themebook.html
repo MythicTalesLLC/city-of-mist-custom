@@ -11,7 +11,7 @@
 			<select name="system.subtype">
 				{{selectOptions THEME_SUBTYPES_PLUS_VARIES localize=true selected=item.system.subtype}}
 			</select>
-			{{> "systems/city-of-mist/templates/parts/systemComp.hbs" item=item TBSYSTEMLIST=TBSYSTEMLIST}}
+			{{> "systems/city-of-mist-ii/templates/parts/systemComp.hbs" item=item TBSYSTEMLIST=TBSYSTEMLIST}}
 			{{#if (devMode)}}
 			<div>
 				<label>
@@ -24,8 +24,8 @@
 		<label class="dialog-label" for="free-content"> Allow Override </label>
 		<input type="checkbox" name="system.free_content" {{#if item.system.free_content}} checked {{/if}} title="Will be replaced by non-overrideable themebook of same name"> <br>
 		<textarea name="system.description">{{item.system.description}}</textarea>
-		{{> "systems/city-of-mist/templates/parts/themebook-questions.hbs" item=item data=data tagtype="power" questionList=item.system.power_questions}}
-		{{> "systems/city-of-mist/templates/parts/themebook-questions.hbs" item=item data=data tagtype="weakness" questionList=item.system.weakness_questions}}
+		{{> "systems/city-of-mist-ii/templates/parts/themebook-questions.hbs" item=item data=data tagtype="power" questionList=item.system.power_questions}}
+		{{> "systems/city-of-mist-ii/templates/parts/themebook-questions.hbs" item=item data=data tagtype="weakness" questionList=item.system.weakness_questions}}
 		<div id="improvements">
 			<h1 id="improvements-header"> Improvements
 				<a class="add-improvement" data-distinct="true" data-tag-type="weakness_questions" data-item-type="themebook" data-duplicates="false" data-actor-id={{actor.id}}> <i class="fas fa-plus-square"></i></a></p>

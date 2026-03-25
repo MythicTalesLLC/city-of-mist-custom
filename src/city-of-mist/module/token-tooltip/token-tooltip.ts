@@ -3,7 +3,7 @@ import { CityActor } from "../city-actor.js";
 import {HTMLHandlers} from "../universal-html-handlers.js";
 import {HTMLTools} from "../tools/HTMLTools.js";
 
-const KEY = 'city-of-mist';
+const KEY = 'city-of-mist-ii';
 const CSS_PREFIX = `${KEY}--`;
 const CSS_TOOLTIP = `${CSS_PREFIX}tooltip`;
 const CSS_SHOW = `${CSS_PREFIX}show`;
@@ -50,7 +50,7 @@ export class TokenTooltip {
 	async onHover(token: Token<CityActor>, hovered: boolean) {
 		if (hovered) {
 			try {
-				if (!game.settings.get("city-of-mist", "tokenToolTip"))
+				if (!game.settings.get("city-of-mist-ii", "tokenToolTip"))
 					return true;
 			} catch (e) {
 				console.warn(e);
@@ -121,7 +121,7 @@ export class TokenTooltip {
 
 	async updateData(token: Token<CityActor>) {
 		this.nameElement.style.display = '';
-		const templateHTML = await renderTemplate("systems/city-of-mist/module/token-tooltip/tooltip.html", {token, actor: token.actor, sheetowner:null });
+		const templateHTML = await renderTemplate("systems/city-of-mist-ii/module/token-tooltip/tooltip.html", {token, actor: token.actor, sheetowner:null });
 		this.nameElement.innerHTML = templateHTML;
 		HTMLHandlers.applyBasicHandlers($(this.element));
 		$(this.element).find(".toggle-combat").on("click", ev => CityHelpers.toggleCombat(ev))

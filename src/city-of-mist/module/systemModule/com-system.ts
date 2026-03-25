@@ -4,7 +4,7 @@ import { CityActor } from "../city-actor.js";
 import { Move } from "../city-item.js";
 import { CoMTypeSystem } from "./com-type-system.js";
 
-const PATH = "systems/city-of-mist";
+const PATH = "systems/city-of-mist-ii";
 
 export class CoMSystem extends CoMTypeSystem {
 
@@ -50,7 +50,7 @@ export class CoMSystem extends CoMTypeSystem {
 		const templateData = { actor };
 		return await renderTemplate(`${PATH}/templates/dialogs/pc-downtime-chooser-com.hbs`, templateData);
 	}
-	get name() { return "city-of-mist" as const; }
+	get name() { return "city-of-mist-ii" as const; }
 	get localizationString() { return localize("CityOfMist.settings.system.0"); }
 
 	override themeTypes() {
@@ -116,7 +116,7 @@ export class CoMSystem extends CoMTypeSystem {
 	}
 
 	headerTable = {
-		character: "systems/city-of-mist/templates/parts/character-sheet-header.html",
+		character: "systems/city-of-mist-ii/templates/parts/character-sheet-header.html",
 		threat: "",
 		crew: ""
 	}
@@ -124,9 +124,9 @@ export class CoMSystem extends CoMTypeSystem {
 	override async onChangeTo(): Promise<void> {
 		await super.onChangeTo();
 		const settings = this.settings;
-		await settings.set("baseSystem", "city-of-mist");
-		await settings.set("movesInclude", "city-of-mist");
-		await settings.set("system", "city-of-mist");
+		await settings.set("baseSystem", "city-of-mist-ii");
+		await settings.set("movesInclude", "city-of-mist-ii");
+		await settings.set("system", "city-of-mist-ii");
 	}
 
 }
@@ -134,7 +134,7 @@ export class CoMSystem extends CoMTypeSystem {
 
 declare global {
 	interface SYSTEM_NAMES {
-		"city-of-mist": string;
+		"city-of-mist-ii": string;
 	}
 
 	interface ThemeTypes extends ReturnType<CoMSystem["themeTypes"]> { }

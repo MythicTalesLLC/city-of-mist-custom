@@ -104,7 +104,7 @@
     },
     "motivation": "mystery",
     "fade_type": "fade",
-    "system_compatiblity": "city-of-mist",
+    "system_compatiblity": "city-of-mist-ii",
     "locale_name": "#CityOfMist.themebook.esoterica.name",
     "systemName": "Esoterica"
   },
@@ -116,7 +116,7 @@
   },
   "flags": {},
   "_stats": {
-    "systemId": "city-of-mist",
+    "systemId": "city-of-mist-ii",
     "systemVersion": "3.1.4",
     "coreVersion": "13.345",
     "createdTime": 1715985441977,

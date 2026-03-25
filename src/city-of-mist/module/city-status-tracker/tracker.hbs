@@ -8,10 +8,10 @@
 		</span>
 		<ol id="city-status-tracker-list">
 			{{#each actor.statuses as |status|}}
-			{{> "systems/city-of-mist/templates/parts/tag-or-status.hbs" item=status sheetowner=null locked=true}}
+			{{> "systems/city-of-mist-ii/templates/parts/tag-or-status.hbs" item=status sheetowner=null locked=true}}
 			{{/each}}
 			{{#each actor.tags as |tag indexTag|}}
-			{{> "systems/city-of-mist/templates/parts/tag-or-status.hbs" item=tag sheetowner=null locked=true}}
+			{{> "systems/city-of-mist-ii/templates/parts/tag-or-status.hbs" item=tag sheetowner=null locked=true}}
 			{{/each}}
 		</ol>
 	</div>

@@ -269,7 +269,7 @@ export class CityHandlebarsHelpers extends HandlebarsHelpers {
 		'themeDisplayis': function (str: keyof ReturnType<typeof DEV_SETTINGS>["themeStyle"]["choices"]): boolean {
 			const style = CitySettings.get("themeStyle");
 			switch (str) {
-				case "city-of-mist":
+				case "city-of-mist-ii":
 					return str == style;
 				case "mist-engine":
 					return str == style;
@@ -302,11 +302,11 @@ export class CityHandlebarsHelpers extends HandlebarsHelpers {
 		},
 
 		'isCoM': function () {
-			return CitySettings.getBaseSystem() == "city-of-mist";
+			return CitySettings.getBaseSystem() == "city-of-mist-ii";
 		},
 
 		'isMistEngine': function () {
-			return CitySettings.getBaseSystem() != "city-of-mist";
+			return CitySettings.getBaseSystem() != "city-of-mist-ii";
 		},
 
 		'spectrumConvert': function (x: keyof typeof SPECTRUM_VALUES) {

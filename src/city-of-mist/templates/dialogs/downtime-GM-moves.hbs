@@ -5,7 +5,7 @@
 	</div>
 	<div class="actor-group" data-owner-id="{{actorMoveListPair.actor.id}}"	data-token-id="{{actorMoveListPair.actor.tokenId}}" data-scene-id="{{actorMoveListPair.actor.sceneId}}" >
 		{{#each actorMoveListPair.movelist as |move|}}
-		{{> "systems/city-of-mist/templates/parts/gmmove-display.html" move=move locked=true sheetowner=actorMoveListPair.actor }}
+		{{> "systems/city-of-mist-ii/templates/parts/gmmove-display.html" move=move locked=true sheetowner=actorMoveListPair.actor }}
 		{{/each}}
 	</div>
 	{{/each}}

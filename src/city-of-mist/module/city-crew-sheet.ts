@@ -6,8 +6,8 @@ export class CityCrewSheet extends CityActorSheet {
 	static override get defaultOptions() {
 		return foundry.utils.mergeObject(super.defaultOptions, {
 			classes: ["city", "sheet", "actor"],
-			// classes: ["city-of-mist", "sheet", "actor"],
-			template: "systems/city-of-mist/templates/crew-sheet.html",
+			// classes: ["city-of-mist-ii", "sheet", "actor"],
+			template: "systems/city-of-mist-ii/templates/crew-sheet.html",
 			width: 700,
 			height: 970,
       tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "themes" }]
