@@ -1,12 +1,44 @@
 <div class="header-row">
-	<input type="text" class="borderless character-name" name="name" value="{{actor.name}}" title="Character Name" placeholder="Character Name" {{#if actor.system.locked}} disabled {{/if}}>
+	<input type="text" class="borderless character-name" name="name" value="{{actor.name}}" title="Character Name"
+		placeholder="Character Name" {{#if actor.system.locked}} disabled {{/if}}>
+</div>
+<div class="header-row theme-summary-row">
+	{{#if actor.headerThemeSummaries.length}}
+	{{#each actor.headerThemeSummaries as |summary|}}
+	<div class="header-theme-summary summary-{{summary.key}}">
+		<div class="header-theme-summary-label">{{summary.label}}</div>
+		<div class="header-theme-summary-value">{{summary.value}}</div>
+	</div>
+	{{/each}}
+	{{else}}
+	<div class="header-theme-summary summary-empty">
+		<div class="header-theme-summary-label">{{localize 'CityOfMist.terms.themes'}}</div>
+		<div class="header-theme-summary-value">{{localize 'CityOfMist.message.noThemeSummary'}}</div>
+	</div>
+	{{/if}}
+</div>
+<div class="header-row veteran-controls-row">
+	<div class="header-theme-summary veteran-summary">
+		<div class="header-theme-summary-label">{{localize 'CityOfMist.terms.veteranThemes'}}</div>
+		<div class="header-theme-summary-value">{{actor.veteranHeaderSummary}}</div>
+	</div>
+	<div class="header-veteran-controls">
+		<div class="header-veteran-slots">
+			{{localize 'CityOfMist.terms.veteranSlots'}}: {{actor.veteranThemeCount}} / {{actor.veteranSlotCapacity}}
+		</div>
+		{{#unless actor.system.locked}}
+		<a class="veteran-slot-add" title="{{localize 'CityOfMist.command.addVeteranSlot'}}">
+			<i class="fas fa-plus-square"></i>
+		</a>
+		<a class="veteran-slot-remove {{#unless actor.canRemoveVeteranSlot}}disabled-control{{/unless}}"
+			title="{{localize 'CityOfMist.command.removeVeteranSlot'}}">
+			<i class="fas fa-minus-square"></i>
+		</a>
+		{{/unless}}
+	</div>
 </div>
 <div class="header-row">
-	<input type="text" class="borderless mythos-name" name="system.mythos" value="{{actor.system.mythos}}" placeholder="{{localize 'CityOfMist.terms.mythos'}}" title="{{localize 'CityOfMist.terms.mythos'}}" {{#if actor.system.locked}} disabled {{/if}}>
-	<div class="separator-icon"> &diams;</div>
-	<input type="text" class="borderless logos-name" name="system.logos" value="{{actor.system.logos}}" placeholder="{{localize 'CityOfMist.terms.logos' }}" title="{{localize 'CityOfMist.terms.logos' }}" {{#if actor.system.locked}} disabled {{/if}}>
+	<input type="text" class="borderless short-description" name="system.short_description"
+		value="{{actor.system.short_description}}" placeholder="{{localize 'CityOfMist.terms.short_desc' }}"
+		title=" {{localize 'CityOfMist.terms.short_desc' }}" {{#if actor.system.locked}} disabled {{/if}}>
 </div>
-<div class="header-row">
-	<input type="text" class="borderless short-description" name="system.short_description" value="{{actor.system.short_description}}" placeholder="{{localize 'CityOfMist.terms.short_desc' }}" title=" {{localize 'CityOfMist.terms.short_desc' }}" {{#if actor.system.locked}} disabled {{/if}}>
-</div>
-

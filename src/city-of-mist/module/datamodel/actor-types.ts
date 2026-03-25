@@ -1,21 +1,22 @@
-const {StringField:txt, BooleanField: bool, NumberField: num, SchemaField: sch, HTMLField: html , ArrayField: arr, DocumentIdField: id, ObjectField: obj} = foundry.data.fields;
-const VERSION ="1" ; //TODO: import real version number
+const { StringField: txt, BooleanField: bool, NumberField: num, SchemaField: sch, HTMLField: html, ArrayField: arr, DocumentIdField: id, ObjectField: obj } = foundry.data.fields;
+const VERSION = "1"; //TODO: import real version number
+export const DEFAULT_MAIN_THEME_CAPACITY = 4;
 
 function default_template() {
 	return {
-		locked: new bool({initial: false}),
+		locked: new bool({ initial: false }),
 		biography: new html(),
 		description: new html(),
 		short_description: new txt(),
 		gmnotes: new html(),
 		crewThemes: new arr(new id()),
-		version: new txt({initial:VERSION})
+		version: new txt({ initial: VERSION })
 	};
 }
 
 function themeHolder() {
 	return {
-		finalized: new bool({initial: false}),
+		finalized: new bool({ initial: false }),
 		mythos: new txt(),
 	};
 }
@@ -24,14 +25,14 @@ function TagSelector() { //this entire thing may be defunct
 	return {
 		selectedTags: new arr(new id()),
 		selectedMove: new id(),
-		selectedMoveGroup: new txt({initial: "Core"}),
+		selectedMoveGroup: new txt({ initial: "Core" }),
 	};
 }
 
 function aliasable() {
 	return {
-		alias: new txt({initial:"?????"}),
-		useAlias: new bool({initial:true}),
+		alias: new txt({ initial: "?????" }),
+		useAlias: new bool({ initial: true }),
 	};
 }
 
@@ -46,7 +47,7 @@ function person() {
 }
 
 export class CharacterSchema extends foundry.abstract.DataModel {
-	get type() {return "character" as const;}
+	get type() { return "character" as const; }
 	static override defineSchema() {
 		const ret = {
 			...default_template(),
@@ -54,18 +55,21 @@ export class CharacterSchema extends foundry.abstract.DataModel {
 			...TagSelector(),
 			...person(),
 			...aliasable(),
-			essence: new sch( {
+			essence: new sch({
 				systemName: new txt<keyof EssenceNames>(), //essence system name
 				isBurned: new bool(),
 			}),
+			mainThemeCapacity: new num({ initial: DEFAULT_MAIN_THEME_CAPACITY, min: DEFAULT_MAIN_THEME_CAPACITY, integer: true }),
+			veteranThemeIds: new arr(new id(), { initial: [] }),
+			activeExtraIds: new arr(new id(), { initial: [] }),
 			activeExtraId: new id(),
 			activeCrewId: new id(),
 			buildup: new arr(
-				new num( {choices:[0,1]}),
-				{initial : [0,0,0,0,0]}
+				new num({ choices: [0, 1] }),
+				{ initial: [0, 0, 0, 0, 0] }
 			),
-			unspentBU: new num({initial: 0, min:0, integer:true}),
-			flashback_used: new bool({initial: false}),
+			unspentBU: new num({ initial: 0, min: 0, integer: true }),
+			flashback_used: new bool({ initial: false }),
 		} as const;
 		return ret;
 	}
@@ -73,22 +77,22 @@ export class CharacterSchema extends foundry.abstract.DataModel {
 }
 
 export class ThreatSchema extends foundry.abstract.DataModel {
-	get type() {return "threat" as const;}
+	get type() { return "threat" as const; }
 	static override defineSchema() {
 		return {
 			...default_template(),
 			...aliasable(),
 			...themeHolder(),
 			...person(),
-			is_template: new bool({initial: false}),
-			template_ids: new arr(new id(), {initial: []}),
-			collectiveSize: new num({initial: 0})
+			is_template: new bool({ initial: false }),
+			template_ids: new arr(new id(), { initial: [] }),
+			collectiveSize: new num({ initial: 0 })
 		};
 	}
 }
 
 export class CrewSchema extends foundry.abstract.DataModel {
-	get type() {return "crew" as const;}
+	get type() { return "crew" as const; }
 	static override defineSchema() {
 		return {
 			...default_template(),

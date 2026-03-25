@@ -3,6 +3,7 @@ import { ThemeKit } from "./city-item.js";
 import { CityItem } from "./city-item.js";
 import { CitySettings } from "./settings.js";
 import { CityActor } from "./city-actor.js";
+import { DEFAULT_MAIN_THEME_CAPACITY } from "./datamodel/actor-types.js";
 
 export class CityDataMigration {
 	static async checkMigration() {
@@ -10,6 +11,7 @@ export class CityDataMigration {
 		if (version < game.system.version) {
 			await this.migrateFrom(version);
 		}
+		await this.backfillExpandedCharacterModel();
 
 	}
 
@@ -22,7 +24,7 @@ export class CityDataMigration {
 		try {
 			await this.migrationScript(oldVersion);
 		} catch (a) {
-			ui.notifications.error( "Error in migration!");
+			ui.notifications.error("Error in migration!");
 			return;
 		}
 		ui.notifications.notify("Migration Complete!");
@@ -42,6 +44,31 @@ export class CityDataMigration {
 		}
 	}
 
+	static async backfillExpandedCharacterModel() {
+		if (!game.user.isGM) {
+			return;
+		}
+		for (const actor of (game.actors.contents as CityActor[])) {
+			if (!actor.isPC()) {
+				continue;
+			}
+			const updateData: Record<string, unknown> = {};
+			if (actor.system.mainThemeCapacity == null) {
+				updateData["system.mainThemeCapacity"] = DEFAULT_MAIN_THEME_CAPACITY;
+			}
+			if (!Array.isArray(actor.system.veteranThemeIds)) {
+				updateData["system.veteranThemeIds"] = [];
+			}
+			if (!Array.isArray(actor.system.activeExtraIds)) {
+				updateData["system.activeExtraIds"] = actor.system.activeExtraId ? [actor.system.activeExtraId] : [];
+			}
+			if (Object.keys(updateData).length > 0) {
+				await actor.update(updateData);
+			}
+			await actor.syncVeteranThemeIds();
+		}
+	}
+
 	/**repairs themekits missing letters due to handlebars hating arrays */
 	static async actorTKFix(actor: CityActor) {
 		for (const theme of actor.getThemes()) {
@@ -55,50 +82,50 @@ export class CityDataMigration {
 	static async themekitFix(themekit: ThemeKit) {
 		let change = false;
 		let arr = themekit.system.power_tagstk;
-		while (arr.length < 10)  {
-			arr.push( {
-				tagname: "",
-				description: "",
-				letter: ""
-			});
-			change= true;
-			await themekit.update( {"system.power_tagstk": arr});
-		}
-		for (const tag of arr) {
-			if (!tag.letter)  {
-				tag.letter = CityItem.numIndexToLetter(arr.indexOf(tag));
-				change = true;
-			}
-		}
-		if (change)  {
-			console.log(`Fixing theme kit ${themekit.name}`);
-			await themekit.update( {"system.power_tagstk": arr});
-		}
-		arr = themekit.system.weakness_tagstk;
-		while (arr.length < 4)  {
-			arr.push( {
+		while (arr.length < 10) {
+			arr.push({
 				tagname: "",
 				description: "",
 				letter: ""
 			});
 			change = true;
-			await themekit.update( {"system.weakness_tagstk": arr});
+			await themekit.update({ "system.power_tagstk": arr });
 		}
 		for (const tag of arr) {
-			if (!tag.letter)  {
+			if (!tag.letter) {
 				tag.letter = CityItem.numIndexToLetter(arr.indexOf(tag));
 				change = true;
 			}
 		}
-		if (change)  {
-			await themekit.update( {"system.weakness_tagstk": arr});
+		if (change) {
+			console.log(`Fixing theme kit ${themekit.name}`);
+			await themekit.update({ "system.power_tagstk": arr });
+		}
+		arr = themekit.system.weakness_tagstk;
+		while (arr.length < 4) {
+			arr.push({
+				tagname: "",
+				description: "",
+				letter: ""
+			});
+			change = true;
+			await themekit.update({ "system.weakness_tagstk": arr });
+		}
+		for (const tag of arr) {
+			if (!tag.letter) {
+				tag.letter = CityItem.numIndexToLetter(arr.indexOf(tag));
+				change = true;
+			}
+		}
+		if (change) {
+			await themekit.update({ "system.weakness_tagstk": arr });
 		}
 	}
 
 	static async actorloadoutDuplicationFix(actor: CityActor) {
 		const items = actor.items;
 		const loadoutThemes = items
-			.filter (x=> x.isTheme()
+			.filter(x => x.isTheme()
 				&& x.isLoadoutTheme()) as Theme[];
 		for (const theme of loadoutThemes) {
 			const tb = theme.themebook;
@@ -112,7 +139,7 @@ export class CityDataMigration {
 			}
 		}
 		const remaining = items
-			.filter (x=> x.isTheme()
+			.filter(x => x.isTheme()
 				&& x.isLoadoutTheme()) as Theme[];
 		while (remaining.length > 1) {
 			const item = remaining.pop();

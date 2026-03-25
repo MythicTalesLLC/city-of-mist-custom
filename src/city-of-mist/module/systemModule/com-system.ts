@@ -1,6 +1,6 @@
 import { ThemeTypeInfo } from "./baseSystemModule.js";
 import { localize } from "../city.js";
-import {CityActor} from "../city-actor.js";
+import { CityActor } from "../city-actor.js";
 import { Move } from "../city-item.js";
 import { CoMTypeSystem } from "./com-type-system.js";
 
@@ -13,8 +13,10 @@ export class CoMSystem extends CoMTypeSystem {
 	}
 
 	override directoryName(actor: CityActor) {
-		const mythos = actor.system.mythos ? ` [${actor.system.mythos}]` : "";
-		const owner_name = actor.name + mythos;
+		const themeSummary = actor.isPC() && actor.directoryThemeSummary
+			? ` [${actor.directoryThemeSummary}]`
+			: actor.system.mythos ? ` [${actor.system.mythos}]` : "";
+		const owner_name = actor.name + themeSummary;
 		if (actor.isOwner) {
 			if (actor.name != actor.tokenName && actor.tokenName?.length) {
 				return owner_name + ` / ${actor.tokenName}`;
@@ -27,7 +29,7 @@ export class CoMSystem extends CoMTypeSystem {
 
 	override canCreateTags(_move: Move): boolean {
 		return true;
-				//TODO: May fix this later, but given the breadth of moves that can create things, some through dynamite results, it's best to just allow it for everything.
+		//TODO: May fix this later, but given the breadth of moves that can create things, some through dynamite results, it's best to just allow it for everything.
 	}
 
 
@@ -45,40 +47,40 @@ export class CoMSystem extends CoMTypeSystem {
 	// }
 
 	override async downtimeTemplate(actor: CityActor): Promise<string> {
-		const templateData ={actor};
+		const templateData = { actor };
 		return await renderTemplate(`${PATH}/templates/dialogs/pc-downtime-chooser-com.hbs`, templateData);
 	}
-	get name() {return  "city-of-mist" as const;}
-	get localizationString() {return localize("CityOfMist.settings.system.0");}
+	get name() { return "city-of-mist" as const; }
+	get localizationString() { return localize("CityOfMist.settings.system.0"); }
 
 	override themeTypes() {
 		return {
 			"Logos": {
 				localization: "CityOfMist.terms.logos",
-				sortOrder : 3,
+				sortOrder: 3,
 				"increaseLocalization": "CityOfMist.terms.attention",
-				"decreaseLocalization":  "CityOfMist.terms.crack",
+				"decreaseLocalization": "CityOfMist.terms.crack",
 				identityName: "CityOfMist.terms.identity",
 			},
 			"Mythos": {
 				localization: "CityOfMist.terms.mythos",
 				sortOrder: 1,
 				"increaseLocalization": "CityOfMist.terms.attention",
-				"decreaseLocalization":  "CityOfMist.terms.fade",
+				"decreaseLocalization": "CityOfMist.terms.fade",
 				identityName: "CityOfMist.terms.mystery",
 			},
 			"Mist": {
 				localization: "CityOfMist.terms.mist",
 				sortOrder: 2,
 				"increaseLocalization": "CityOfMist.terms.attention",
-				"decreaseLocalization":  "CityOfMist.terms.strike",
+				"decreaseLocalization": "CityOfMist.terms.strike",
 				identityName: "CityOfMist.terms.directive",
 			},
 			"Crew": {
-				localization:"CityOfMist.themebook.crew.name",
+				localization: "CityOfMist.themebook.crew.name",
 				sortOrder: 5,
 				"increaseLocalization": "CityOfMist.terms.attention",
-				"decreaseLocalization":  "CityOfMist.terms.crew-fade",
+				"decreaseLocalization": "CityOfMist.terms.crew-fade",
 				identityName: "CityOfMist.terms.identity",
 				specials: ["crew"],
 			},
@@ -86,14 +88,14 @@ export class CoMSystem extends CoMTypeSystem {
 				localization: " CityOfMist.terms.loadoutTheme.name",
 				sortOrder: 100,
 				"increaseLocalization": "CityOfMist.terms.attention",
-				"decreaseLocalization":  "CityOfMist.terms.crew-fade",
+				"decreaseLocalization": "CityOfMist.terms.crew-fade",
 				identityName: "",
 				specials: ["loadout"],
 			},
 			"Extra": {
 				localization: "CityOfMist.terms.extra",
 				"increaseLocalization": "CityOfMist.terms.attention",
-				"decreaseLocalization":  "CityOfMist.terms.crew-fade",
+				"decreaseLocalization": "CityOfMist.terms.crew-fade",
 				sortOrder: 5,
 				identityName: "CityOfMist.terms.identity",
 				specials: ["extra"],
@@ -101,7 +103,7 @@ export class CoMSystem extends CoMTypeSystem {
 		} as const satisfies Record<string, ThemeTypeInfo>;
 	}
 
-	gameTerms() : Record<keyof GameTerms, localizationString>{
+	gameTerms(): Record<keyof GameTerms, localizationString> {
 		return {
 			collective: "CityOfMist.terms.colllective",
 			buildUpPoints: "CityOfMist.terms.buildup",
@@ -119,11 +121,11 @@ export class CoMSystem extends CoMTypeSystem {
 		crew: ""
 	}
 
-	override async onChangeTo() : Promise<void> {
+	override async onChangeTo(): Promise<void> {
 		await super.onChangeTo();
 		const settings = this.settings;
 		await settings.set("baseSystem", "city-of-mist");
-		await settings.set( "movesInclude", "city-of-mist");
+		await settings.set("movesInclude", "city-of-mist");
 		await settings.set("system", "city-of-mist");
 	}
 

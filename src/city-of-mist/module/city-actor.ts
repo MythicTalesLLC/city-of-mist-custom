@@ -18,6 +18,7 @@ import { SceneTags } from "./scene-tags.js";
 import { CityDialogs } from "./city-dialogs.js";
 import { CityLogger } from "./city-logger.js";
 import { ACTORMODELS } from "./datamodel/actor-types.js";
+import { DEFAULT_MAIN_THEME_CAPACITY } from "./datamodel/actor-types.js";
 import { Juice } from "./city-item.js";
 import { Improvement } from "./city-item.js";
 import { Status } from "./city-item.js";
@@ -32,19 +33,275 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 
 	declare sheet: CityActorSheet;
 
-	get mainThemes() : Theme[] {
-		return this.getThemes().sort ( (a,b) => b.themeSortValue() - a.themeSortValue());
+	get mainThemeCapacity(): number {
+		if (!this.isPC()) {
+			return DEFAULT_MAIN_THEME_CAPACITY;
+		}
+		const configured = Number(this.system.mainThemeCapacity ?? DEFAULT_MAIN_THEME_CAPACITY);
+		if (Number.isNaN(configured)) {
+			return DEFAULT_MAIN_THEME_CAPACITY;
+		}
+		return Math.max(DEFAULT_MAIN_THEME_CAPACITY, configured);
 	}
 
-	get loadout() : Theme | undefined {
-		return this.items.find(  (item: CityItem) => {
+	get mainThemeSlotCount(): number {
+		if (!this.isPC()) {
+			return this.mainThemes.length;
+		}
+		return Math.max(this.mainThemeCapacity, this.mainThemes.length);
+	}
+
+	get veteranSlotCapacity(): number {
+		if (!this.isPC()) {
+			return 0;
+		}
+		return Math.max(0, this.mainThemeCapacity - DEFAULT_MAIN_THEME_CAPACITY);
+	}
+
+	get veteranThemeCount(): number {
+		return this.veteranThemes.length;
+	}
+
+	get canAssignVeteranThemes(): boolean {
+		return this.isPC() && this.mainThemes.length > DEFAULT_MAIN_THEME_CAPACITY;
+	}
+
+	get canRemoveVeteranSlot(): boolean {
+		if (!this.isPC()) {
+			return false;
+		}
+		if (this.mainThemeCapacity <= DEFAULT_MAIN_THEME_CAPACITY) {
+			return false;
+		}
+		return this.mainThemes.length <= this.mainThemeCapacity - 1;
+	}
+
+	get headerThemeSummaries(): Array<{ key: string; label: string; value: string; count: number; }> {
+		if (!this.isPC()) {
+			return [];
+		}
+		const groups = new Map<string, Theme[]>();
+		const themeTypes = SystemModule.allThemeTypes();
+		for (const theme of this.mainThemes) {
+			const themeType = theme.getThemeType();
+			const themeInfo = themeTypes[themeType];
+			if (themeInfo?.specials?.some(x => ["crew", "extra", "loadout"].includes(x))) {
+				continue;
+			}
+			if (!groups.has(themeType)) {
+				groups.set(themeType, []);
+			}
+			groups.get(themeType)!.push(theme);
+		}
+		return Array.from(groups.entries())
+			.sort(([a], [b]) => {
+				const aOrder = themeTypes[a as keyof typeof themeTypes]?.sortOrder ?? 100;
+				const bOrder = themeTypes[b as keyof typeof themeTypes]?.sortOrder ?? 100;
+				return aOrder - bOrder;
+			})
+			.map(([key, themes]) => ({
+				key: key.toLowerCase(),
+				label: localize(themeTypes[key as keyof typeof themeTypes]?.localization ?? key),
+				value: themes.map(theme => theme.displayedName).join(" • "),
+				count: themes.length,
+			}));
+	}
+
+	get veteranHeaderSummary(): string {
+		if (!this.isPC()) {
+			return "";
+		}
+		if (this.veteranThemes.length == 0) {
+			return localize("CityOfMist.message.noVeteranThemes");
+		}
+		return this.veteranThemes.map(theme => theme.displayedName).join(" • ");
+	}
+
+	get directoryThemeSummary(): string {
+		if (!this.isPC()) {
+			return "";
+		}
+		const parts = this.headerThemeSummaries.map(summary => `${summary.count} ${summary.label}`);
+		if (this.veteranSlotCapacity > 0) {
+			parts.push(`${this.veteranThemeCount}/${this.veteranSlotCapacity} ${localize("CityOfMist.terms.veteran")}`);
+		}
+		return parts.join(" / ");
+	}
+
+	get mainThemeSlots(): (Theme | undefined)[] {
+		const displayThemes = this.isPC()
+			? this.mainThemes.filter(theme => !this.isVeteranTheme(theme)).concat(this.mainThemes.filter(theme => this.isVeteranTheme(theme)))
+			: this.mainThemes;
+		const slots = displayThemes.slice() as (Theme | undefined)[];
+		while (slots.length < this.mainThemeSlotCount) {
+			slots.push(undefined);
+		}
+		return slots;
+	}
+
+	isVeteranSlot(index: number): boolean {
+		return index >= DEFAULT_MAIN_THEME_CAPACITY;
+	}
+
+	get crewCardId(): number {
+		return this.mainThemeSlotCount;
+	}
+
+	get activeExtraCardId(): number {
+		return this.crewCardId + 1;
+	}
+
+	get loadoutCardId(): number {
+		return this.crewCardId + 2;
+	}
+
+	get tagStatusCardId(): number {
+		return this.crewCardId + 3;
+	}
+
+	get requiredFlipCardCount(): number {
+		if (!this.isPC()) {
+			return Math.max(8, this.mainThemeSlotCount);
+		}
+		return Math.max(8, this.mainThemeSlotCount + 4);
+	}
+
+	get veteranThemeIds(): string[] {
+		if (!this.isPC()) {
+			return [];
+		}
+		return Array.isArray(this.system.veteranThemeIds)
+			? this.system.veteranThemeIds.filter(id => !!id && String(id).length > 0)
+			: [];
+	}
+
+	get veteranThemes(): Theme[] {
+		if (!this.isPC()) {
+			return [];
+		}
+		const veteranIds = new Set(this.veteranThemeIds);
+		return this.getThemes().filter(theme => veteranIds.has(theme.id));
+	}
+
+	isVeteranTheme(theme: Theme | undefined): boolean {
+		if (!this.isPC() || !theme) {
+			return false;
+		}
+		return this.veteranThemeIds.includes(theme.id);
+	}
+
+	normalizeVeteranThemeIds(preferredIds: string[] = this.veteranThemeIds, themeCapacity = this.mainThemeCapacity): string[] {
+		if (!this.isPC()) {
+			return [];
+		}
+		const mainThemeIds = this.mainThemes.map(theme => theme.id);
+		const veteranCount = Math.max(0, Math.min(mainThemeIds.length, themeCapacity) - DEFAULT_MAIN_THEME_CAPACITY);
+		const preferredInOrder = mainThemeIds.filter(id => preferredIds.includes(id));
+		let veteranThemeIds = preferredInOrder.slice(-veteranCount);
+		if (veteranThemeIds.length < veteranCount) {
+			const fallbackIds = [...mainThemeIds].reverse().filter(id => !veteranThemeIds.includes(id));
+			while (veteranThemeIds.length < veteranCount) {
+				const nextId = fallbackIds.shift();
+				if (!nextId) {
+					break;
+				}
+				veteranThemeIds.unshift(nextId);
+			}
+		}
+		return mainThemeIds.filter(id => veteranThemeIds.includes(id));
+	}
+
+	async syncVeteranThemeIds(preferredIds: string[] = this.veteranThemeIds, themeCapacity = this.mainThemeCapacity) {
+		if (!this.isPC()) {
+			return;
+		}
+		const veteranThemeIds = this.normalizeVeteranThemeIds(preferredIds, themeCapacity);
+		const unchanged = veteranThemeIds.length == this.veteranThemeIds.length
+			&& veteranThemeIds.every((id, index) => id == this.veteranThemeIds[index]);
+		if (unchanged) {
+			return;
+		}
+		await this.update({ "system.veteranThemeIds": veteranThemeIds });
+	}
+
+	async increaseMainThemeCapacity(amount = 1) {
+		if (!this.isPC()) {
+			return;
+		}
+		const mainThemeCapacity = Math.max(DEFAULT_MAIN_THEME_CAPACITY, this.mainThemeCapacity + amount);
+		const veteranThemeIds = this.normalizeVeteranThemeIds(this.veteranThemeIds, mainThemeCapacity);
+		await this.update({
+			"system.mainThemeCapacity": mainThemeCapacity,
+			"system.veteranThemeIds": veteranThemeIds,
+		});
+	}
+
+	async decreaseMainThemeCapacity(amount = 1) {
+		if (!this.canRemoveVeteranSlot) {
+			return;
+		}
+		const mainThemeCapacity = Math.max(DEFAULT_MAIN_THEME_CAPACITY, this.mainThemeCapacity - amount);
+		const veteranThemeIds = this.normalizeVeteranThemeIds(this.veteranThemeIds, mainThemeCapacity);
+		await this.update({
+			"system.mainThemeCapacity": mainThemeCapacity,
+			"system.veteranThemeIds": veteranThemeIds,
+		});
+	}
+
+	async toggleVeteranTheme(themeId: string) {
+		if (!this.canAssignVeteranThemes) {
+			return;
+		}
+		const theme = this.getTheme(themeId);
+		if (!theme || theme.isExtraTheme() || theme == this.loadout) {
+			return;
+		}
+		const preferredIds = this.veteranThemeIds.filter(id => id != themeId);
+		if (!this.isVeteranTheme(theme)) {
+			preferredIds.push(themeId);
+		}
+		await this.syncVeteranThemeIds(preferredIds);
+	}
+
+	get activeExtraIds(): string[] {
+		if (!this.isPC()) {
+			return [];
+		}
+		const configured = Array.isArray(this.system.activeExtraIds)
+			? this.system.activeExtraIds.filter(id => !!id && String(id).length > 0)
+			: [];
+		if (configured.length > 0) {
+			return configured;
+		}
+		return this.system.activeExtraId ? [this.system.activeExtraId] : [];
+	}
+
+	get activeExtras(): Theme[] {
+		if (!this.isPC()) {
+			return [];
+		}
+		const extraThemes = this.allLinkedExtraThemes;
+		const extraIds = new Set(this.activeExtraIds);
+		return extraThemes.filter(theme => extraIds.has(theme.id));
+	}
+
+	canAddMainTheme(): boolean {
+		return this.mainThemes.length < this.mainThemeCapacity;
+	}
+
+	get mainThemes(): Theme[] {
+		return this.getThemes().sort((a, b) => b.themeSortValue() - a.themeSortValue());
+	}
+
+	get loadout(): Theme | undefined {
+		return this.items.find((item: CityItem) => {
 			return item.isTheme() && item.isLoadoutTheme();
 		}) as Theme | undefined;
 	}
 
-	possibleExtraThemeSources() : CityActor[] {
-		const nonGMOwners = game.users.filter( x=> !x.isGM && this.testUserPermission(x, "OWNER"));
-		return (game.actors.contents as CityActor[]).filter( actor => nonGMOwners.some( user => actor.testUserPermission(user, "OWNER") && actor.system.type != "crew"));
+	possibleExtraThemeSources(): CityActor[] {
+		const nonGMOwners = game.users.filter(x => !x.isGM && this.testUserPermission(x, "OWNER"));
+		return (game.actors.contents as CityActor[]).filter(actor => nonGMOwners.some(user => actor.testUserPermission(user, "OWNER") && actor.system.type != "crew"));
 	}
 
 	get crewTheme(): Theme | undefined {
@@ -53,37 +310,37 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 
 	get crewThemes(): Theme[] {
 		const nonGMOwners = game.users
-			.filter( x=> !x.isGM && this.testUserPermission(x, "OWNER"));
+			.filter(x => !x.isGM && this.testUserPermission(x, "OWNER"));
 		const validCrewActors = (game.actors.contents as CityActor[])
-			.filter( actor => nonGMOwners.some( user => actor.testUserPermission(user, "OWNER")
+			.filter(actor => nonGMOwners.some(user => actor.testUserPermission(user, "OWNER")
 				&& actor.system.type == "crew"));
-		return validCrewActors.flatMap( x=> x.getThemes());
+		return validCrewActors.flatMap(x => x.getThemes());
 	}
 
 	get activeCrew(): Theme | undefined {
-		if (this.system.type != "character") {return undefined;}
+		if (this.system.type != "character") { return undefined; }
 		const crewThemes = this.crewThemes;
 		const activeId = this.system.activeCrewId;
-		const theme = crewThemes.find( x=> x.id == activeId);
-		if (theme) {return theme;}
-		if (crewThemes.length == 0) {return undefined;}
+		const theme = crewThemes.find(x => x.id == activeId);
+		if (theme) { return theme; }
+		if (crewThemes.length == 0) { return undefined; }
 		return crewThemes[0];
 	}
 
-	get allLinkedExtraThemes() : Theme[] {
+	get allLinkedExtraThemes(): Theme[] {
 		const sources = this.possibleExtraThemeSources();
-		return sources.flatMap( actor => actor.personalExtraThemes());
+		return sources.flatMap(actor => actor.personalExtraThemes());
 	}
 
-	personalExtraThemes() : Theme[] {
+	personalExtraThemes(): Theme[] {
 		const themeType = this.system.type;
 		switch (themeType) {
 			case "character":
-			return this.items.filter( x=> x.isTheme() && x.isExtraTheme()) as Theme[];
+				return this.items.filter(x => x.isTheme() && x.isExtraTheme()) as Theme[];
 			case "crew":
 				return [];
 			case "threat":
-		return this.items.filter( x=> x.isTheme()) as Theme[];
+				return this.items.filter(x => x.isTheme()) as Theme[];
 			default:
 				themeType satisfies never;
 				console.error(`Unknown themetype ${themeType as string}`);
@@ -91,18 +348,18 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		}
 	}
 
-	isDanger() : this is Danger {
+	isDanger(): this is Danger {
 		return this.system.type == "threat";
 	}
 
 	/** gets top level gmmoves (not submoves) */
 	get gmmoves() {
 		return this.getGMMoves()
-			.filter( x=> !x.system.superMoveId);
+			.filter(x => !x.system.superMoveId);
 	}
 
-	get clues() : Clue[] {
-		return this.items.filter(x=> x.system.type == "clue") as Clue[];
+	get clues(): Clue[] {
+		return this.items.filter(x => x.system.type == "clue") as Clue[];
 	}
 
 	get clueJournal(): ClueJournal[] {
@@ -118,35 +375,35 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	get collectiveStatus(): Status[] {
-		return	this.getStatuses().filter(x=>x.system.specialType == "collective");
+		return this.getStatuses().filter(x => x.system.specialType == "collective");
 	}
 
 	async updateCollectiveStatus(this: Danger): Promise<void> {
 		const collective = this.collectiveStatus;
 		const useCollective = CitySettings.get("collectiveMechanics");
 		if (this.collective_size == 0 || useCollective == "city-of-mist") {
-			const promises = collective.map( status=> status.delete());
+			const promises = collective.map(status => status.delete());
 			await Promise.allSettled(promises);
 			return;
 		} else {
 			if (collective.length == 0) {
 				const col_name = SystemModule.active.collectiveTermName();
-				await this.createNewStatus(col_name, this.collective_size, this.collective_size, { "specialType": "collective"});
+				await this.createNewStatus(col_name, this.collective_size, this.collective_size, { "specialType": "collective" });
 				return;
 			}
 			if (this.collective_size != collective[0].system.tier) {
-				await collective[0].update( {"system.tier": this.collective_size, "system.pips": 0});
+				await collective[0].update({ "system.tier": this.collective_size, "system.pips": 0 });
 			}
 		}
 	}
 
-	async getCollectiveStatus() : Promise<Status> {
+	async getCollectiveStatus(): Promise<Status> {
 		let collective = this.collectiveStatus;
 		if (!collective.length) {
 			// const system = CitySettings.getBaseSystem();
 			// const col_name = localize(COLLECTIVE[system]);
-				const col_name = SystemModule.active.collectiveTermName();
-			await this.createNewStatus(col_name, this.collective_size, 0, { "specialType": "collective"});
+			const col_name = SystemModule.active.collectiveTermName();
+			await this.createNewStatus(col_name, this.collective_size, 0, { "specialType": "collective" });
 			collective = this.collectiveStatus;
 		}
 		return collective[0];
@@ -157,13 +414,13 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	get my_spectrums() {
-		return this.items.filter( x=> x.isSpectrum());
+		return this.items.filter(x => x.isSpectrum());
 	}
 
 	get collective_size() {
 		if (this.system.type == "threat") {
 			const size = Number(this.system.collectiveSize ?? 0);
-			if (Number.isNaN(size)) {return 0;}
+			if (Number.isNaN(size)) { return 0; }
 			return size;
 		}
 		return 0;
@@ -177,7 +434,7 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		return this.system.type == "character";
 	}
 
-	isPC() : this is PC {
+	isPC(): this is PC {
 		return this.system.type == "character";
 	}
 
@@ -186,26 +443,26 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	is_danger_or_extra() {
-		return this.system.type ==  "threat";
+		return this.system.type == "threat";
 	}
 
 	is_crew_theme() {
-		return this.system.type ==  "crew";
+		return this.system.type == "crew";
 	}
 
-	get helpPoints(): Juice[]  {
+	get helpPoints(): Juice[] {
 		return this.items.
-			filter( x=>x.isJuice() &&  x.isHelp()) as Juice[];
+			filter(x => x.isJuice() && x.isHelp()) as Juice[];
 	}
 
-	get hurtPoints (): Juice[] {
+	get hurtPoints(): Juice[] {
 		return this.items.
-			filter( x=>x.isJuice() &&  x.isHurt()) as Juice[];
+			filter(x => x.isJuice() && x.isHurt()) as Juice[];
 	}
 
 	get juice() {
 		return this.items.
-			filter( x=> x.isJuice());
+			filter(x => x.isJuice());
 	}
 
 	get tokenId() {
@@ -216,65 +473,61 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		return this?.token?.parent?.id ?? "";
 	}
 
-	get storyTagsAndStatuses() : (Tag  | Status) [] {
+	get storyTagsAndStatuses(): (Tag | Status)[] {
 		return (this.my_statuses as (Tag | Status)[])
 			.concat(this.my_story_tags);
 	}
 
-	hasHelpFor(actorId: string) :boolean {
-		return this.helpPoints.some( x=> x.system.targetCharacterId == actorId && x.system.amount > 0);
+	hasHelpFor(actorId: string): boolean {
+		return this.helpPoints.some(x => x.system.targetCharacterId == actorId && x.system.amount > 0);
 
 	}
 
 	hasHurtFor(actorId: string) {
-		return this.hurtPoints.some( x=> x.system.targetCharacterId == actorId && x.system.amount > 0);
+		return this.hurtPoints.some(x => x.system.targetCharacterId == actorId && x.system.amount > 0);
 
 	}
 
 	override get visible() {
-		if (this.system.type == "threat" && this.name == SceneTags.SCENE_CONTAINER_ACTOR_NAME)
-			{return false;}
-		else
-			{return super.visible;}
+		if (this.system.type == "threat" && this.name == SceneTags.SCENE_CONTAINER_ACTOR_NAME) { return false; }
+		else { return super.visible; }
 	}
 
 	/** Gets amount of juice for a given provided actor id.
 	whichOne can be either "help" | "hurt"
 	returns Number
 	 */
-	getHelpHurtFor( whichOne: "help" | "hurt" = "help", targetCharacterId: string) {
-		let arr ;
+	getHelpHurtFor(whichOne: "help" | "hurt" = "help", targetCharacterId: string) {
+		let arr;
 		switch (whichOne) {
 			case "help": arr = this.helpPoints; break;
-			case "hurt" : arr = this.hurtPoints; break;
+			case "hurt": arr = this.hurtPoints; break;
 			default:
 				throw new Error(`Bad request: ${whichOne as string}, must use either "help" or "hurt"`);
 		}
 		return arr
-			.filter( juice => juice.targets(targetCharacterId))
-			.reduce( (acc,juice) => juice.system.amount + acc, 0);
+			.filter(juice => juice.targets(targetCharacterId))
+			.reduce((acc, juice) => juice.system.amount + acc, 0);
 	}
 
-	getGMMoves(depth = 0) : GMMove[] {
-		if (depth > 2) {return [];}
-		if (!this.isDanger()) {return [];}
-		const GMMoves : GMMove[] = this.items
-			.filter( x => x.isGMMove()) as GMMove[];
-		const attached = this.getAttachedTemplates().map( x=> x?.getGMMoves(depth+1)  ?? []).flat();
+	getGMMoves(depth = 0): GMMove[] {
+		if (depth > 2) { return []; }
+		if (!this.isDanger()) { return []; }
+		const GMMoves: GMMove[] = this.items
+			.filter(x => x.isGMMove()) as GMMove[];
+		const attached = this.getAttachedTemplates().map(x => x?.getGMMoves(depth + 1) ?? []).flat();
 		return GMMoves.concat(attached);
 	}
 
-	getSpectrums(depth = 0) : Spectrum[] {
-		if (depth > 2) {return [];}
-		if (this.isDanger())
-			{return [];}
-		const mySpectrums : Spectrum[] = this.items.filter( x=> x.system.type == "spectrum") as Spectrum[];
+	getSpectrums(depth = 0): Spectrum[] {
+		if (depth > 2) { return []; }
+		if (this.isDanger()) { return []; }
+		const mySpectrums: Spectrum[] = this.items.filter(x => x.system.type == "spectrum") as Spectrum[];
 		const templateSpectrums = this.getAttachedTemplates()
-			.map( x=> x?.getSpectrums(depth+1) ?? [])
+			.map(x => x?.getSpectrums(depth + 1) ?? [])
 			.flat();
 		for (const spec of templateSpectrums) {
-			if (!mySpectrums.find( x=> x.name == spec.name))
-				{mySpectrums.push(spec);}
+			if (!mySpectrums.find(x => x.name == spec.name)) { mySpectrums.push(spec); }
 		}
 		return mySpectrums;
 
@@ -284,12 +537,12 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		return this.getGMMoves().find(x => x.id == move_id)?.parent == this;
 	}
 
-	getAttachedTemplates() : Danger[] {
-		if (this.system.type != "threat") {return [];}
+	getAttachedTemplates(): Danger[] {
+		if (this.system.type != "threat") { return []; }
 		return (this.system.template_ids ?? [])
-			.map( id =>  CityHelpers.getDangerTemplate(id)
+			.map(id => CityHelpers.getDangerTemplate(id)
 				?? CityDB.getActorById(id) as Danger)
-			.filter (x => x != null);
+			.filter(x => x != null);
 	}
 
 	versionIsLessThan(version: string) {
@@ -299,15 +552,14 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	async updateVersion(version: string) {
 		version = String(version);
 		if (this.versionIsLessThan(version)) {
-			console.debug (`Updated version of ${this.name} to ${version}`);
+			console.debug(`Updated version of ${this.name} to ${version}`);
 			for (const item of this.items) {
 				console.debug(`Updating Version of Item: ${item.name}`);
 				await item.updateVersion(version);
 			}
-			return await this.update( {"system.version" : version});
+			return await this.update({ "system.version": version });
 		}
-		if (version < this.system.version)
-			{console.warn (`Failed attempt to downgrade version of ${this.name} to ${version}`);}
+		if (version < this.system.version) { console.warn(`Failed attempt to downgrade version of ${this.name} to ${version}`); }
 
 	}
 
@@ -321,28 +573,28 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	/** returns the tag for a given id
 	@return {CityItem}
 	 */
-	getTag(id: string): Tag  | undefined {
+	getTag(id: string): Tag | undefined {
 		return this.items.find(x => x.isTag() && x.id == id) as Tag | undefined;
 	}
 
 	/** returns the item for a given id
 	@return {CityItem}
 	 */
-	getItem(id: string): CityItem  | undefined{
-		return this.items.find(x =>  x.id == id);
+	getItem(id: string): CityItem | undefined {
+		return this.items.find(x => x.id == id);
 	}
 
 	/** returns the tag for a given id
 	@return {CityItem[]}
 	 */
 	getStoryTags(): Tag[] {
-		return this.items.filter( x => {
+		return this.items.filter(x => {
 			return x.system.type == "tag" && x.system.subtype == "story";
 		})
 			.sort(CityDB.namesort<CityItem>) as Tag[];
 	}
 
-	getSelectable(id: string) :Tag | Status | undefined{
+	getSelectable(id: string): Tag | Status | undefined {
 		return this.items.find(x => (x.isTag() || x.isStatus()) && x.id == id) as Tag | Status | undefined;
 	}
 
@@ -350,7 +602,7 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		return this.items.find(x => x.isStatus() && x.id == id) as Status;
 	}
 
-	getStatuses() : Status[] {
+	getStatuses(): Status[] {
 		return this.items
 			.filter(item => item.isStatus())
 			.sort(CityDB.namesort) as Status[];
@@ -360,11 +612,11 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		return this.items.find(x => x.isClue() && x.id == id) as Clue | undefined;
 	}
 
-	getJournalClue(id: string) : ClueJournal | undefined{
+	getJournalClue(id: string): ClueJournal | undefined {
 		return this.items.find(x => x.isJournal() && x.id == id) as ClueJournal | undefined;
 	}
 
-	getJuice(id: string) : Juice | undefined {
+	getJuice(id: string): Juice | undefined {
 		return this.items.find(x => x.isJuice() && x.id == id) as Juice | undefined;
 	}
 
@@ -372,7 +624,7 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		return this.getGMMoves().find(x => x.isGMMove() && x.id == id);
 	}
 
-	getImprovement(id: string) : Improvement | undefined {
+	getImprovement(id: string): Improvement | undefined {
 		return this.items.find(x => x.isImprovement() && x.id == id) as Improvement | undefined;
 	}
 
@@ -381,19 +633,18 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	hasStatus(name: string): Status | undefined {
-		return this.items.find( x => x.isStatus() && x.name == name)as Status | undefined;
+		return this.items.find(x => x.isStatus() && x.name == name) as Status | undefined;
 	}
 
-	isNewCharacter() : boolean {
+	isNewCharacter(): boolean {
 		return !this.system.finalized;
 	}
 
-	getTags(themeId : string | null = null, subtype :null | Tag["system"]["subtype"]  = null) : Tag[] {
-		const tags=  this.items.filter(x => {
+	getTags(themeId: string | null = null, subtype: null | Tag["system"]["subtype"] = null): Tag[] {
+		const tags = this.items.filter(x => {
 			return x.system.type == "tag" && (themeId == null || x.system.theme_id == themeId) && (subtype == null || x.system.subtype == subtype);
 		});
-		if (! tags.filter)
-			{throw new Error("non array returned");}
+		if (!tags.filter) { throw new Error("non array returned"); }
 		return tags as Tag[];
 	}
 
@@ -402,9 +653,9 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 @param {{removeImprovement ?: boolean}} options
 @param {boolean} options.removeImprovement removes an improvement from the actor as tag is deleted
 	 */
-	async deleteTag(tagId :string, options: {removeImprovement?: boolean;} = {}) {
-		const tag  =  this.getTag(tagId);
-		if (!tag) {return;}
+	async deleteTag(tagId: string, options: { removeImprovement?: boolean; } = {}) {
+		const tag = this.getTag(tagId);
+		if (!tag) { return; }
 		let afterMsg = "";
 		if (tag.theme != null && !tag.isBonusTag()) {
 			const theme = tag.theme;
@@ -417,7 +668,7 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 				afterMsg = localize("CityOfMist.log.theme.remImp");
 			}
 		}
-		await CityLogger.modificationLog(this, `Deleted` , tag, afterMsg);
+		await CityLogger.modificationLog(this, `Deleted`, tag, afterMsg);
 		return await this.deleteEmbeddedById(tagId);
 	}
 
@@ -433,15 +684,14 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	@param {string} name
 	 */
 	async deleteStatusByName(name: string) {
-		const status = this.getStatuses().find (x=> x.name == name);
-		if (status)
-			{await this.deleteStatus(status.id);}
+		const status = this.getStatuses().find(x => x.name == name);
+		if (status) { await this.deleteStatus(status.id); }
 	}
 
 	async deleteGMMove(id: string) {
 		const move = this.getGMMove(id);
-		if (!move) {throw new Error(`Can't delte bad id ${id}`);}
-		const promises = move.submoves.map( x=> this.deleteGMMove(x.id));
+		if (!move) { throw new Error(`Can't delte bad id ${id}`); }
+		const promises = move.submoves.map(x => this.deleteGMMove(x.id));
 		await Promise.allSettled(promises);
 		return await this.deleteEmbeddedById(id);
 
@@ -459,27 +709,25 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		return await this.deleteEmbeddedById(id);
 	}
 
-	async spendJuice (id: string, amount =1) {
-		const juice = this.items.find( x=> x.system.type =="juice"  &&x.id == id) as Juice | undefined;
-		if (!juice) {throw new Error(`Can't find juice ${id}`);}
+	async spendJuice(id: string, amount = 1) {
+		const juice = this.items.find(x => x.system.type == "juice" && x.id == id) as Juice | undefined;
+		if (!juice) { throw new Error(`Can't find juice ${id}`); }
 		await juice.spend(amount);
-		if (juice.getAmount() <= 0)
-			{await this.deleteJuice(id);}
+		if (juice.getAmount() <= 0) { await this.deleteJuice(id); }
 	}
 
 	async deleteImprovement(impId: string) {
-		const imp  = this.getImprovement(impId);
-		if (!imp)
-			{throw new Error(`Improvement ${impId} not found`);}
+		const imp = this.getImprovement(impId);
+		if (!imp) { throw new Error(`Improvement ${impId} not found`); }
 		if (imp.system.theme_id && imp.system.theme_id.length > 0) {
-			const theme =  this.getTheme(imp.system.theme_id);
+			const theme = this.getTheme(imp.system.theme_id);
 			if (!theme) {
 				throw new Error(`Can't find theme ${imp.system.theme_id}`);
 			}
 			await theme.incUnspentUpgrades();
 		} else {
 			if (this.system.type == "character") {
-				await this.update({"system.unspentBU": this.system.unspentBU+1});
+				await this.update({ "system.unspentBU": this.system.unspentBU + 1 });
 			} else {
 				throw new Error("Something strange happened");
 			}
@@ -488,12 +736,12 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	async setTokenName(name: string) {
-		await this.update({token: {name}});
+		await this.update({ token: { name } });
 	}
 
 	async deleteTheme(themeId: string, awardBU = true) {
 		const theme = this.getTheme(themeId);
-		if (!theme) {throw new Error(`Can't find theme ${themeId}`);}
+		if (!theme) { throw new Error(`Can't find theme ${themeId}`); }
 		await theme.setFlag("city-of-mist", "pendingDelete", true);
 		if (awardBU && this.system.type == "character") {
 			const BUV = theme.getBuildUpValue();
@@ -518,67 +766,74 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 			}
 		}
 		await this.deleteEmbeddedById(themeId);
+		if (this.isPC() && !theme.isExtraTheme()) {
+			await this.syncVeteranThemeIds(this.veteranThemeIds.filter(id => id != themeId));
+		}
 		console.log("Deleting theme");
 	}
 
 	async deleteThemeKit(themeKitId: string) {
-		if (!themeKitId) {return;}
+		if (!themeKitId) { return; }
 		console.log("Deleting Theme Kit");
 		await this.deleteEmbeddedById(themeKitId);
 	}
 
-	getImprovements(themeId : string | null = null) : Improvement[] {
+	getImprovements(themeId: string | null = null): Improvement[] {
 		return this.items.filter(x => x.system.type == "improvement" && (themeId == null || x.system.theme_id == themeId)) as Improvement[];
 	}
 
 	/** get improvements from self and from other activeExtra and crew theme
 	 */
 	getAllImprovements(): Improvement[] {
-		if (!this.is_character())
-			{return this.getImprovements();}
+		if (!this.is_character()) { return this.getImprovements(); }
 		const base = this.getImprovements();
 		const crewImprovements = this.getCrewThemes()
-			.flatMap( x=> x.getImprovements());
+			.flatMap(x => x.getImprovements());
 		const activeExtraImprovements =
-			this.activeExtra ? this.activeExtra.getImprovements(): [];
+			this.activeExtra ? this.activeExtra.getImprovements() : [];
 		return base
 			.concat(crewImprovements)
 			.concat(activeExtraImprovements);
 	}
 
 	get activeExtra(): Theme | undefined {
-		if (this.system.type != "character") {return undefined;}
-		const id = this.system.activeExtraId ;
+		if (this.system.type != "character") { return undefined; }
 		const list = this.allLinkedExtraThemes;
-		if (id) {
-			const theme = list.find( theme => theme.id == id);
-			if (theme) {return theme;}
+		for (const id of this.activeExtraIds) {
+			const theme = list.find(extraTheme => extraTheme.id == id);
+			if (theme) {
+				return theme;
+			}
 		}
-		if( list.length > 0) {return list[0];}
+		if (list.length > 0) { return list[0]; }
 		return undefined;
 	}
 
 	getCrewThemes(): Theme[] {
 		return (game.actors.contents as CityActor[])
-			.filter( actor => actor.system.type=="crew" && actor.isOwner)
-			.flatMap( actor=> actor.getThemes());
+			.filter(actor => actor.system.type == "crew" && actor.isOwner)
+			.flatMap(actor => actor.getThemes());
 	}
 
-	async createNewTheme(name: string, themebook: Themebook | ThemeKit, isExtra: boolean = false ) {
+	async createNewTheme(name: string, themebook: Themebook | ThemeKit, isExtra: boolean = false) {
 		const nascent = !this.isNewCharacter();
 		const unspent_upgrades = nascent ? 1 : 3;
 		const themebook_name = themebook.name;
-		const system : Partial<Theme["system"]>= {
+		const system: Partial<Theme["system"]> = {
 			themebook_id: themebook.id, themebook_name, unspent_upgrades, nascent, isExtra
 		};
 		const obj = {
-			name, type: "theme", system	};
-		if (this.mainThemes.length > 3 && !isExtra) {
+			name, type: "theme", system
+		};
+		if (!this.canAddMainTheme() && !isExtra) {
 			ui.notifications.warn("Can't add another theme");
 			return null;
 		}
-		const theme  = await this.createNewItem(obj) as Theme;
+		const theme = await this.createNewItem(obj) as Theme;
 		if (theme) {
+			if (this.isPC() && !isExtra) {
+				await this.syncVeteranThemeIds(this.veteranThemeIds.concat(theme.id));
+			}
 			Hooks.callAll("themeCreated", this, theme);
 			return theme;
 		}
@@ -586,11 +841,11 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	async addThemeKit(tk: ThemeKit, isExtra: boolean = false) {
-		if (this.mainThemes.length>3 && !isExtra) {
+		if (!this.canAddMainTheme() && !isExtra) {
 			ui.notifications.warn("Can't add extra theme kit, already at 4 themes");
 			return;
 		}
-		const localtk =  await this.createNewItem(tk) as ThemeKit;
+		const localtk = await this.createNewItem(tk) as ThemeKit;
 		if (!localtk.id) {
 			throw new Error("Doesn't have an ID");
 		}
@@ -598,7 +853,7 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 
-	async createNewThemeKit( name = "Unnamed Theme Kit") {
+	async createNewThemeKit(name = "Unnamed Theme Kit") {
 		const obj = {
 			name,
 			type: "themekit",
@@ -609,63 +864,68 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 
 	getActivatedImprovementEffects(move_id: string) {
 		return this.getAllImprovements()
-			.filter( x=> x.isImprovementActivated(move_id))
-			.map (x => x.getActivatedEffect());
+			.filter(x => x.isImprovementActivated(move_id))
+			.map(x => x.getActivatedEffect());
 	}
 
 	async createNewItem(obj: object) {
 		return (await this.createEmbeddedDocuments("Item", [obj]))[0];
 	}
 
-	async createNewStatus (name: string, tier=1, pips=0, options: DeepPartial<Status["system"]>={} ): Promise<Status> {
-		const obj : DeepPartial<Status> = {
+	async createNewStatus(name: string, tier = 1, pips = 0, options: DeepPartial<Status["system"]> = {}): Promise<Status> {
+		const obj: DeepPartial<Status> = {
 			name,
 			type: "status",
-			system : {...options, pips, tier}};
+			system: { ...options, pips, tier }
+		};
 		return await this.createNewItem(obj) as Status;
 	}
 
-	async createClue(metaSource= "", clueData: Partial<Clue["system"]> = {}) {
-		const existing =  this.items.find( x=> x.system.type == "clue" && x.system.metaSource == metaSource) as Clue | undefined;
+	async createClue(metaSource = "", clueData: Partial<Clue["system"]> = {}) {
+		const existing = this.items.find(x => x.system.type == "clue" && x.system.metaSource == metaSource) as Clue | undefined;
 		if (metaSource && existing) {
-			await existing.update({"system.amount": existing.system.amount+1});
+			await existing.update({ "system.amount": existing.system.amount + 1 });
 			return true;
 		}
-		const obj = await this.createNewClue({metaSource, ...clueData});
-		const clue =  this.getClue(obj.id)!;
+		const obj = await this.createNewClue({ metaSource, ...clueData });
+		const clue = this.getClue(obj.id)!;
 		const updateObj = await CityHelpers.itemDialog(clue);
 		if (updateObj) {
-			const partialstr = clue.system.partial ? ", partial": "";
-			await CityHelpers.modificationLog(this, "Created", clue, `${clue.system.amount}${partialstr}` );
+			const partialstr = clue.system.partial ? ", partial" : "";
+			await CityHelpers.modificationLog(this, "Created", clue, `${clue.system.amount}${partialstr}`);
 			return true;
-		} else  {
+		} else {
 			await this.deleteClue(obj.id);
 			return false;
 		}
 	}
 
-	async createNewClue (dataobj: Partial<Clue["system"]> & {name?: string} ) : Promise<Clue>{
+	async createNewClue(dataobj: Partial<Clue["system"]> & { name?: string }): Promise<Clue> {
 		const name = dataobj.name ?? "Unnamed Clue";
 		const obj = {
-			name, type: "clue", system : {amount:1, ...dataobj}};
+			name, type: "clue", system: { amount: 1, ...dataobj }
+		};
 		return await this.createNewItem(obj) as Clue;
 	}
 
-	async createNewJuice (name: string, subtype = "") {
+	async createNewJuice(name: string, subtype = "") {
 		const obj = {
-			name, type: "juice", system : {amount:1, subtype}};
+			name, type: "juice", system: { amount: 1, subtype }
+		};
 		return await this.createNewItem(obj);
 	}
 
-	async createNewGMMove (name : string, systemData : Partial<GMMove["system"]> = {}) : Promise<GMMove> {
+	async createNewGMMove(name: string, systemData: Partial<GMMove["system"]> = {}): Promise<GMMove> {
 		const obj = {
-			name, type: "gmmove", system : {subtype: "soft", ...systemData}};
+			name, type: "gmmove", system: { subtype: "soft", ...systemData }
+		};
 		return await this.createNewItem(obj) as GMMove;
 	}
 
-	async createNewSpectrum (name: string) {
+	async createNewSpectrum(name: string) {
 		const obj = {
-			name, type: "spectrum" };
+			name, type: "spectrum"
+		};
 		return await this.createNewItem(obj);
 	}
 
@@ -673,27 +933,26 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		const obj = {
 			name: "Unnamed Journal",
 			type: "journal",
-			system: {question, answer}
+			system: { question, answer }
 		};
-		if (!this.clueJournal.find( x=> x.system.question == question && x.system.answer == answer))
-			{return await this.createNewItem(obj);}
-		else {return null;}
+		if (!this.clueJournal.find(x => x.system.question == question && x.system.answer == answer)) { return await this.createNewItem(obj); }
+		else { return null; }
 	}
 
 	getThemeKit(id: string) {
-		return this.items.find( x=> x.id == id && x.isThemeKit());
+		return this.items.find(x => x.id == id && x.isThemeKit());
 	}
 
 
-	localExtraThemes() : Theme[] {
-		return this.items.filter( x=> x.isTheme()
+	localExtraThemes(): Theme[] {
+		return this.items.filter(x => x.isTheme()
 			&& x.isExtraTheme()
 		) as Theme[];
 	}
 
-	getThemes() : Theme[]{
-		return this.items.filter( x=> x.isTheme()
-			&&	!x.isBeingDeleted()
+	getThemes(): Theme[] {
+		return this.items.filter(x => x.isTheme()
+			&& !x.isBeingDeleted()
 			&& !x.isExtraTheme()
 			&& x != this.loadout) as Theme[];
 	}
@@ -702,9 +961,9 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		const themes = this.getThemes();
 		let count = 0;
 		for (const theme of themes) {
-				if (theme.isBeingDeleted()) {continue;}
-				const theme_type = theme.getThemeType();
-				if (target_type == theme_type) {++count;}
+			if (theme.isBeingDeleted()) { continue; }
+			const theme_type = theme.getThemeType();
+			if (target_type == theme_type) { ++count; }
 		}
 		return count;
 	}
@@ -712,25 +971,25 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	async incBuildUp(this: PC, amount = 1) {
 		const oldBU = this.system.buildup.slice();
 		const [newBU, improvements] = CityHelpers.modArray(oldBU, amount, 5);
-		await this.update({"system.buildup" : newBU});
-		if (improvements > 0)  {
-			await this.update({"system.unspentBU": this.system.unspentBU+improvements});
+		await this.update({ "system.buildup": newBU });
+		if (improvements > 0) {
+			await this.update({ "system.unspentBU": this.system.unspentBU + improvements });
 		}
 		return improvements;
 	}
 
-	async decBuildUp(this: PC, amount =1) {
+	async decBuildUp(this: PC, amount = 1) {
 		const oldBU = this.system.buildup.slice();
 		const [newBU, improvements] = CityHelpers.modArray(oldBU, -amount, 5);
-		await this.update({"system.buildup" : newBU});
-		if (improvements < 0)  {
-			await this.update({"system.unspentBU": this.system.unspentBU+improvements});
+		await this.update({ "system.buildup": newBU });
+		if (improvements < 0) {
+			await this.update({ "system.unspentBU": this.system.unspentBU + improvements });
 		}
 		return improvements;
 	}
 
-	getBuildUp(this:PC) : number {
-		return this.system.buildup.reduce( (acc, i) => acc+i, 0);
+	getBuildUp(this: PC): number {
+		return this.system.buildup.reduce((acc, i) => acc + i, 0);
 	}
 
 	/** adds a tag to a chosen theme on the actor
@@ -740,28 +999,29 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	@param question_letter{string} letter of the answered question or "_" for bonus,
 	@param {{crispy ?: boolean, awardImprovement ?: boolean, noEdit ?: boolean}} options
 	 */
-	async addTag(theme_id: string, temp_subtype: "power" | "weakness" | "bonus",  question_letter: string | null, options: {crispy?: boolean; awardImprovement?: boolean; noEdit?: boolean;} = {}) {
+	async addTag(theme_id: string, temp_subtype: "power" | "weakness" | "bonus", question_letter: string | null, options: { crispy?: boolean; awardImprovement?: boolean; noEdit?: boolean; } = {}) {
 		const theme = this.getTheme(theme_id);
 		if (!theme) {
 			throw new Error(`Couldn't get Theme for id ${theme_id} on ${this.name}`);
 		}
 		const themebook = theme.getThemebookOrTK();
-		if (options?.crispy == undefined)
-			{if (!this.isPC() && temp_subtype != "weakness") {
+		if (options?.crispy == undefined) {
+			if (!this.isPC() && temp_subtype != "weakness") {
 				options.crispy = true;
 			} else {
 				options.crispy = false;
-			}}
+			}
+		}
 		let tag: Tag, upgrades;
 		if (!themebook) {
 			throw new Error("Couldn't find Themebook!");
 		}
 		switch (themebook.system.type) {
 			case "themebook":
-				[tag, upgrades]= await this._addTagFromThemeBook(theme, temp_subtype, question_letter, options);
+				[tag, upgrades] = await this._addTagFromThemeBook(theme, temp_subtype, question_letter, options);
 				break;
 			case "themekit":
-				[tag, upgrades]= await this._addTagFromThemekit(theme, temp_subtype, question_letter, options);
+				[tag, upgrades] = await this._addTagFromThemekit(theme, temp_subtype, question_letter, options);
 				break;
 			default: throw new Error(`Bad Type : $${themebook.type}`);
 		}
@@ -769,47 +1029,46 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 			await CityDialogs.itemEditDialog(tag);
 		}
 		let afterMsg = "";
-		if (upgrades > 0)
-			{afterMsg = localize("CityOfMist.log.theme.addImp" );}
-		else if (upgrades < 0)
-			{afterMsg = localize("CityOfMist.log.theme.remImp" );}
-		await CityLogger.modificationLog(this, "Created",  tag, afterMsg);
+		if (upgrades > 0) { afterMsg = localize("CityOfMist.log.theme.addImp"); }
+		else if (upgrades < 0) { afterMsg = localize("CityOfMist.log.theme.remImp"); }
+		await CityLogger.modificationLog(this, "Created", tag, afterMsg);
 
 	}
 
-	async _addTagFromThemeBook(theme: Theme, temp_subtype:"power" | "weakness" | "bonus", question_letter: string | null, options : {awardImprovement?: boolean, crispy?: boolean}) : Promise<[Tag,number]> {
+	async _addTagFromThemeBook(theme: Theme, temp_subtype: "power" | "weakness" | "bonus", question_letter: string | null, options: { awardImprovement?: boolean, crispy?: boolean }): Promise<[Tag, number]> {
 		const themebook = theme.getThemebookOrTK()!;
-		if (themebook.system.type == "themekit") {throw new Error("Themekit detected?");
+		if (themebook.system.type == "themekit") {
+			throw new Error("Themekit detected?");
 		}
 		let custom_tag = false;
 		let question, subtag, subtype;
 		let upgrades = 0;
 		switch (temp_subtype) {
-			case "power":{
+			case "power": {
 				subtype = "power";
 				const tagdata = (themebook as Themebook)
-				.themebook_getTagQuestions(temp_subtype)
-				.find( x=> x.letter == question_letter)!;
+					.themebook_getTagQuestions(temp_subtype)
+					.find(x => x.letter == question_letter)!;
 				question = tagdata.question;
 				subtag = tagdata.subtag;
 				await theme.decUnspentUpgrades();
 				upgrades--;
 				break;
 			}
-			case "weakness":{
+			case "weakness": {
 				const tagdata = (themebook as Themebook)
-				.themebook_getTagQuestions(temp_subtype)
-				.find( x=> x.letter == question_letter)!;
+					.themebook_getTagQuestions(temp_subtype)
+					.find(x => x.letter == question_letter)!;
 				subtype = "weakness";
 				question = tagdata.question;
 				subtag = tagdata.subtag;
-				if (options.awardImprovement){
+				if (options.awardImprovement) {
 					await theme.incUnspentUpgrades();
 					upgrades++;
 				}
 				break;
 			}
-			case "bonus" :
+			case "bonus":
 				subtype = "power";
 				custom_tag = true;
 				subtag = false;
@@ -829,20 +1088,20 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 				question,
 				crispy: options?.crispy ?? false,
 				custom_tag,
-				subtagRequired : subtag,
+				subtagRequired: subtag,
 			}
 		};
 		return [await this.createNewItem(obj) as Tag, upgrades];
 	}
 
-	async _addTagFromThemekit(theme: Theme, temp_subtype:"power" | "weakness" | "bonus", question_letter: string | null, options: {awardImprovement ?: boolean, crispy?:boolean},): Promise<[Tag, number]> {
+	async _addTagFromThemekit(theme: Theme, temp_subtype: "power" | "weakness" | "bonus", question_letter: string | null, options: { awardImprovement?: boolean, crispy?: boolean },): Promise<[Tag, number]> {
 		const themebook = theme.getThemebookOrTK()!;
 		if (!themebook.isThemeKit()) {
 			throw new Error("Not a themekit!");
 		}
 		const tagdata = themebook
-		.themekit_getTags(temp_subtype)
-		.find( x=> x.letter == question_letter);
+			.themekit_getTags(temp_subtype)
+			.find(x => x.letter == question_letter);
 		if (!tagdata && temp_subtype != "bonus") {
 			throw new Error(`Can't find TagData for ${theme.name} ${temp_subtype}, ${question_letter}`);
 		}
@@ -852,21 +1111,21 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		let tagname, subtype;
 		let upgrades = 0;
 		const description = tagdata?.description ?? "";
-		switch(temp_subtype) {
+		switch (temp_subtype) {
 			case "power":
 				subtype = "power";
-				tagname = tagdata!.tagname ?? (tagdata as Record<string, string>).name ;
+				tagname = tagdata!.tagname ?? (tagdata as Record<string, string>).name;
 				subtag = false;
 				await theme.decUnspentUpgrades();
-				upgrades --;
+				upgrades--;
 				break;
 			case "weakness":
 				subtype = "weakness";
-				tagname = tagdata!.tagname ?? (tagdata as Record<string, string>).name ;
+				tagname = tagdata!.tagname ?? (tagdata as Record<string, string>).name;
 				subtag = false;
 				if (options.awardImprovement) {
 					await theme.incUnspentUpgrades();
-					upgrades ++;
+					upgrades++;
 				}
 				break;
 			case "bonus":
@@ -888,7 +1147,7 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 				question,
 				crispy: options?.crispy ?? false,
 				custom_tag,
-				subtagRequired : subtag,
+				subtagRequired: subtag,
 				description,
 			},
 		};
@@ -897,17 +1156,16 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 
 	async addImprovement(theme_id: string, number: number) {
 		//TODO: accomodate new effect class in improvement this may not be right spot
-		const theme =  this.getTheme(theme_id);
-		if (!theme) {throw new Error(`Can't find theme ${theme_id}`);}
-		const themebook =  theme.getThemebookOrTK();
-		if (!themebook) {throw new Error(`Can't find theme book for ${theme.name}`);}
+		const theme = this.getTheme(theme_id);
+		if (!theme) { throw new Error(`Can't find theme ${theme_id}`); }
+		const themebook = theme.getThemebookOrTK();
+		if (!themebook) { throw new Error(`Can't find theme book for ${theme.name}`); }
 		// const data = themebook.system;
 		const imp = themebook.isThemeBook()
 			? themebook.themebook_getImprovements()[number]
 			: themebook.themekit_getImprovements()[number];
 		console.log(imp);
-		if (!imp)
-			{throw new Error(`improvement number ${number} not found in theme ${theme_id}`);}
+		if (!imp) { throw new Error(`improvement number ${number} not found in theme ${theme_id}`); }
 		const obj = {
 			name: imp.name,
 			type: "improvement",
@@ -936,7 +1194,7 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 
 	async addBuildUpImprovement(this: PC, impId: string): Promise<Improvement> {
 		const improvements = await CityHelpers.getBuildUpImprovements();
-		const imp = improvements.find(x=> x.id == impId);
+		const imp = improvements.find(x => x.id == impId);
 		if (imp == undefined) {
 			throw new Error(`Couldn't find improvement ID:${impId}`);
 		}
@@ -956,29 +1214,28 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 			}
 		};
 		const unspentBU = this.system.unspentBU;
-		await this.update({"system.unspentBU": unspentBU-1});
+		await this.update({ "system.unspentBU": unspentBU - 1 });
 		return await this.createNewItem(obj) as Improvement;
 	}
 
 
-	getBuildUpImprovements(this:PC ) : Improvement[] {
+	getBuildUpImprovements(this: PC): Improvement[] {
 		return this.items.filter(x => x.system.type == "improvement" && x.system.theme_id.length == 0) as Improvement[];
 	}
 
-	async createStoryTag(name = "Unnamed Tag", preventDuplicates = false, options : TagCreationOptions = {}) : Promise<Tag | null> {
+	async createStoryTag(name = "Unnamed Tag", preventDuplicates = false, options: TagCreationOptions = {}): Promise<Tag | null> {
 		name = name.trim();
 		if (preventDuplicates) {
-			if (this.getStoryTags().some( x=> x.name == name))
-				{return null;}
+			if (this.getStoryTags().some(x => x.name == name)) { return null; }
 		}
 		const temporary = options?.temporary ?? !(game.user.isGM);
-		const obj : DeepPartial<CityItem> = {
+		const obj: DeepPartial<CityItem> = {
 			name,
 			type: "tag",
 			system: {
 				subtype: "story",
 				theme_id: "",
-				question_letter : "_",
+				question_letter: "_",
 				question: "",
 				crispy: false,
 				burned: false,
@@ -990,17 +1247,17 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	get relationshipTags(): Tag[] {
-		return this.items.filter( item => item.isTag() && item.isRelationshipTag()) as Tag[];
+		return this.items.filter(item => item.isTag() && item.isRelationshipTag()) as Tag[];
 	}
 
-	async createRelationshipTag(name = "Unnamed Tag", options: Partial<Tag["system"]> = {}) : Promise<Tag | null> {
-		const obj : DeepPartial<CityItem> = {
+	async createRelationshipTag(name = "Unnamed Tag", options: Partial<Tag["system"]> = {}): Promise<Tag | null> {
+		const obj: DeepPartial<CityItem> = {
 			name: name.trim(),
 			type: "tag",
 			system: {
 				subtype: "relationship",
 				theme_id: "",
-				question_letter : "_",
+				question_letter: "_",
 				question: "",
 				crispy: true,
 				...options,
@@ -1010,21 +1267,19 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	async deleteStoryTagByName(tagname: string) {
-		const tag = this.getStoryTags().find( x=> x.name == tagname);
-		if (tag)
-			{return await this.deleteTag(tag.id);}
+		const tag = this.getStoryTags().find(x => x.name == tagname);
+		if (tag) { return await this.deleteTag(tag.id); }
 	}
 
 	async burnTag(id: string, state = 1) {
-		const tag =  this.getTag(id);
-		if (!tag)
-			{throw new Error(`Can't find tag ${id} to burn`);}
+		const tag = this.getTag(id);
+		if (!tag) { throw new Error(`Can't find tag ${id} to burn`); }
 		const interval = 0.4;
 		if (state > 0) {
 			void CityHelpers.playBurn();
 			let level = 3;
-			while (level  > 0 ) {
-				await tag.burnTag( level-- );
+			while (level > 0) {
+				await tag.burnTag(level--);
 				await CityHelpers.asyncwait(interval);
 			}
 		} else {
@@ -1036,52 +1291,50 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		await this.unburnTag(tagId);
 	}
 
-	async addAttention(themeId: string, amount=1) {
-		const theme =  this.getTheme(themeId);
-		if (!theme) {throw new Error(`Can't find theme id ${themeId}`);}
+	async addAttention(themeId: string, amount = 1) {
+		const theme = this.getTheme(themeId);
+		if (!theme) { throw new Error(`Can't find theme id ${themeId}`); }
 		const extra_improvements = await theme.addAttention(amount);
 		if (this.isNewCharacter()) {
 			console.log("Character finalized");
-			await this.update({"system.finalized" : true});
+			await this.update({ "system.finalized": true });
 		}
 		return extra_improvements;
 	}
 
-	async removeAttention(themeId: string, amount=1) {
+	async removeAttention(themeId: string, amount = 1) {
 		const theme = this.getTheme(themeId);
-		if (!theme) {throw new Error(`Can't find theme id ${themeId}`);}
+		if (!theme) { throw new Error(`Can't find theme id ${themeId}`); }
 		const extra_improvements = await theme.removeAttention(amount);
 		return extra_improvements;
 	}
 
-	async addFade(themeId: string, amount=1) {
-		const theme= this.getTheme(themeId);
-		if (!theme) {throw new Error(`Can't find theme id ${themeId}`);}
+	async addFade(themeId: string, amount = 1) {
+		const theme = this.getTheme(themeId);
+		if (!theme) { throw new Error(`Can't find theme id ${themeId}`); }
 		if (theme.crack == 2) {
 			if (! await HTMLTools.confirmBox(
 				localize("CityOfMist.dialog.actorSheet.addFade.title"),
 				localize("CityOfMist.dialog.actorSheet.addFade.body")
-			)) {return false;}
+			)) { return false; }
 		}
 		const theme_destroyed = await theme.addFade(amount);
 		if (theme_destroyed) {
 			await this.deleteTheme(themeId, true);
 		}
-		let txt =`Crack/Fade added to ${theme.displayedName}`;
-		if (theme_destroyed)
-			{txt += " ---- Theme Destroyed!";}
-		else
-			{txt += ` (Current ${theme.getCrack()})`;}
+		let txt = `Crack/Fade added to ${theme.displayedName}`;
+		if (theme_destroyed) { txt += " ---- Theme Destroyed!"; }
+		else { txt += ` (Current ${theme.getCrack()})`; }
 		await CityHelpers.modificationLog(this, txt);
 		return theme_destroyed;
 	}
 
-	async addMilestone(themeId: string, amount= 1) {
-		const theme= this.getTheme(themeId);
-		if (!theme) {throw new Error(`Can't find theme id ${themeId}`);}
+	async addMilestone(themeId: string, amount = 1) {
+		const theme = this.getTheme(themeId);
+		if (!theme) { throw new Error(`Can't find theme id ${themeId}`); }
 		await theme.addMilestone(amount);
 		const trackName = SystemModule.themeThirdTrackName(theme);
-		let txt =`${theme.parent!.name}: ${trackName} added to ${theme.getDisplayedName()}`;
+		let txt = `${theme.parent!.name}: ${trackName} added to ${theme.getDisplayedName()}`;
 		if (theme.milestone == 2) {
 			txt += "";
 		}
@@ -1089,28 +1342,28 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		return false;
 	}
 
-	async removeMilestone(themeId: string, amount=1) {
+	async removeMilestone(themeId: string, amount = 1) {
 		const theme = this.getTheme(themeId);
-		if (!theme) {throw new Error(`Can't find theme id ${themeId}`);}
+		if (!theme) { throw new Error(`Can't find theme id ${themeId}`); }
 		const extra_improvements = await theme.removeMilestone(amount);
 		// let txt =`${SystemModule.themeThirdTrackName(theme)} added to ${theme.displayedName} (current: ${theme.milestone})`;
 		// await CityHelpers.modificationLog(this, txt);
 		return extra_improvements;
 	}
 
-	async removeFade (themeId:string, amount=1) {
-		const theme= this.getTheme(themeId);
-		if (!theme) {throw new Error(`Can't find theme id ${themeId}`);}
+	async removeFade(themeId: string, amount = 1) {
+		const theme = this.getTheme(themeId);
+		if (!theme) { throw new Error(`Can't find theme id ${themeId}`); }
 		await theme.removeFade(amount);
-		let txt =`${theme.parent!.name}: Crack/Fade removed from ${theme.getDisplayedName()}`;
+		let txt = `${theme.parent!.name}: Crack/Fade removed from ${theme.getDisplayedName()}`;
 		txt += ` (Current ${theme.getCrack()})`;
 		await CityHelpers.modificationLog(this, txt);
 		return false;
 	}
 
-	async resetFade (themeId: string) {
-		const theme= this.getTheme(themeId);
-		if (!theme) {throw new Error(`Can't find theme id ${themeId}`);}
+	async resetFade(themeId: string) {
+		const theme = this.getTheme(themeId);
+		if (!theme) { throw new Error(`Can't find theme id ${themeId}`); }
 		await theme.resetFade();
 	}
 
@@ -1126,32 +1379,36 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		const locked = !this.system.locked;
 		SelectedTagsAndStatus.clearAllActivatedItems();
 		await CityHelpers.playLockOpen();
-		return await this.update( {"system.locked": locked});
+		return await this.update({ "system.locked": locked });
 	}
 
 	async toggleAliasState(this: PC | Danger) {
 		const useAlias = !this.system.useAlias;
-		return await this.update( {system: {useAlias}});
+		return await this.update({ system: { useAlias } });
 	}
 
-	async setExtraThemeId (id: string) {
-		await this.update({system: {activeExtraId:id}});
+	async setExtraThemeId(id: string) {
+		const activeExtraIds = id ? [id] : [];
+		await this.update({
+			"system.activeExtraId": id,
+			"system.activeExtraIds": activeExtraIds,
+		});
 	}
 
 	async grantAttentionForWeaknessTag(id: string) {
-		const tag =  this.getSelectable(id);
-		if (!tag) {throw new Error(`Can't find selectable ${id}`);}
-		if (tag.system.type != "tag") {return;}
-		const theme =  this.getTheme(tag.system.theme_id);
-		if (!theme) {throw new Error(`Can't get theme for ${tag.name}`);}
+		const tag = this.getSelectable(id);
+		if (!tag) { throw new Error(`Can't find selectable ${id}`); }
+		if (tag.system.type != "tag") { return; }
+		const theme = this.getTheme(tag.system.theme_id);
+		if (!theme) { throw new Error(`Can't get theme for ${tag.name}`); }
 		await theme.addAttention();
 	}
 
-	getLinkedTokens() : TokenDocument<this>[] {
-		if (this.token) {return [this.token];}
+	getLinkedTokens(): TokenDocument<this>[] {
+		if (this.token) { return [this.token]; }
 		const actives = this.getActiveTokens()
-			.filter (x=> !x.actor?.token)
-			.map ( x=> "document" in x ?  x.document: x);
+			.filter(x => !x.actor?.token)
+			.map(x => "document" in x ? x.document : x);
 		return actives as TokenDocument<this>[];
 	}
 
@@ -1159,14 +1416,14 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		return this.getDisplayedName();
 	}
 
-	get pronouns() : string[] {
-		if (this.system.type == "crew") {return [];}
+	get pronouns(): string[] {
+		if (this.system.type == "crew") { return []; }
 		const prString = this.system.pronouns;
-		if (!prString) {return [];}
+		if (!prString) { return []; }
 		const prArray = prString
 			.split("/")
-			.map ( str => {
-				if (!str) {return "";}
+			.map(str => {
+				if (!str) { return ""; }
 				return str.trim().toLowerCase();
 			});
 		return CityActor._derivePronouns(prArray);
@@ -1175,25 +1432,25 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	/** takes an array of pronounds and substitutes if it is incomplete
 	 */
 	static _derivePronouns(prArray: string[]): string[] {
-		if (!prArray[0])
-			{return [];}
+		if (!prArray[0]) { return []; }
 		const subtable = {
 			"he": ["him", "his"],
-			"she": ["her" , "hers"],
+			"she": ["her", "hers"],
 			"it": ["it", "its"],
 			"they": ["them", "their"],
 		} as Record<string, string[]>;
 		const first = prArray[0];
-		const subtableEntry : string[] = subtable[first];
-		if (!subtableEntry) {return prArray;}
-		for (let i = 1; i <= subtableEntry.length; i++)
-			{if (!prArray[i]) {
-				prArray[i] = subtableEntry[i-1];}
+		const subtableEntry: string[] = subtable[first];
+		if (!subtableEntry) { return prArray; }
+		for (let i = 1; i <= subtableEntry.length; i++) {
+			if (!prArray[i]) {
+				prArray[i] = subtableEntry[i - 1];
 			}
+		}
 		return prArray;
 	}
 
-	get directoryName() : string {
+	get directoryName(): string {
 		return SystemModule.active.directoryName(this);
 		// const mythos = this.system.mythos ? ` [${this.system.mythos}]` : "";
 		// const owner_name = this.name + mythos;
@@ -1211,18 +1468,14 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	getDisplayedName() {
-		if (this.name == SceneTags.SCENE_CONTAINER_ACTOR_NAME)
-			{return "Scene";}
-		if (this.isToken && this.token)
-			{return this.token.name;}
+		if (this.name == SceneTags.SCENE_CONTAINER_ACTOR_NAME) { return "Scene"; }
+		if (this.isToken && this.token) { return this.token.name; }
 		const controlled = () => {
 			const tokens = this.getActiveTokens();
 			const controlled = tokens.find(tok => tok.controlled);
-			if (controlled)
-				{return controlled.name;}
+			if (controlled) { return controlled.name; }
 			const owned = canvas?.tokens?.ownedTokens?.find(tok => tok.actor == this);
-			if (owned)
-				{return owned.name;}
+			if (owned) { return owned.name; }
 			return null;
 		};
 		return this?.token?.name
@@ -1238,24 +1491,23 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 			case "crew":
 				if (this.isOwner) {
 					return (game.actors.contents as CityActor[])
-						.filter ( (act: CityActor) => {
-						return act.isPC()
-							&& act.isOwner
-							&& act.crewTheme?.parent == this;
-					});
+						.filter((act: CityActor) => {
+							return act.isPC()
+								&& act.isOwner
+								&& act.crewTheme?.parent == this;
+						});
 				}
 				break;
 			case "threat":
-				if (this.name == SceneTags.SCENE_CONTAINER_ACTOR_NAME)
-					{return [];}
+				if (this.name == SceneTags.SCENE_CONTAINER_ACTOR_NAME) { return []; }
 				if (this.isOwner && this.getThemes().length > 0) {
 					return (game.actors.contents as CityActor[])
-					.filter ( (act:CityActor) => {
-						return act.isPC()
-							&& act.isOwner
-							&& act.activeExtra != null
-							&& this.mainThemes.includes(act.activeExtra);
-					});
+						.filter((act: CityActor) => {
+							return act.isPC()
+								&& act.isOwner
+								&& act.activeExtra != null
+								&& this.mainThemes.includes(act.activeExtra);
+						});
 				}
 				break;
 			case "character":
@@ -1272,23 +1524,22 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	async expendFlashback() {
-		await this.update( {"system.flashback_used" : true});
+		await this.update({ "system.flashback_used": true });
 	}
 
 	async refreshFlashback() {
-		await this.update( {"system.flashback_used" : false});
+		await this.update({ "system.flashback_used": false });
 	}
 
-	async sessionEnd () {
+	async sessionEnd() {
 		const items = [];
-		const improvements : Improvement[] = [
-			this.crewThemes.flatMap( theme=> theme.improvements()),
-			this.allLinkedExtraThemes.flatMap(theme=> theme.improvements()),
-			this.items.contents.flatMap( x=> x.isImprovement() ? [x]: []),
+		const improvements: Improvement[] = [
+			this.crewThemes.flatMap(theme => theme.improvements()),
+			this.allLinkedExtraThemes.flatMap(theme => theme.improvements()),
+			this.items.contents.flatMap(x => x.isImprovement() ? [x] : []),
 		].flat();
 		for (const imp of improvements) {
-			if (await imp.refreshImprovementUses())
-				{items.push(imp.name);}
+			if (await imp.refreshImprovementUses()) { items.push(imp.name); }
 		}
 		if (this.system.type == "character" && !(this as PC).hasFlashbackAvailable()) {
 			await this.refreshFlashback();
@@ -1299,55 +1550,57 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 
 	async moveCrewSelector(this: PC, amount: number) {
 		const crewTheme = this.activeCrew;
-		if (!crewTheme) {return;}
+		if (!crewTheme) { return; }
 		const list = this.crewThemes;
-		const ind = list.findIndex( x=> x.id == crewTheme.id);
+		const ind = list.findIndex(x => x.id == crewTheme.id);
 		const newIndex = (ind + amount) % list.length;
-		const newCrew= list[newIndex];
+		const newCrew = list[newIndex];
 		const newId = newCrew.id;
-		await this.update({"system.activeCrewId": newId});
+		await this.update({ "system.activeCrewId": newId });
 		if (!game.user.isGM) {
-			const msg =localize("CityOfMist.logger.action.changeActiveCrew");
+			const msg = localize("CityOfMist.logger.action.changeActiveCrew");
 			await CityLogger.modificationLog(this, msg, newCrew);
 		}
 	}
 
-	async moveExtraSelector(this:PC, amount: number) {
+	async moveExtraSelector(this: PC, amount: number) {
 		const activeExtra = this.activeExtra;
-		if (!activeExtra) {return;}
+		if (!activeExtra) { return; }
 		const list = this.allLinkedExtraThemes;
-		const ind = list.findIndex( x=> x.id == activeExtra.id);
+		const ind = list.findIndex(x => x.id == activeExtra.id);
 		const newIndex = (ind + amount) % list.length;
-		const newExtra= list[newIndex];
+		const newExtra = list[newIndex];
 		const newId = newExtra.id;
-		await this.update({"system.activeExtraId": newId});
+		await this.update({
+			"system.activeExtraId": newId,
+			"system.activeExtraIds": [newId],
+		});
 		if (!game.user.isGM) {
-			const msg =localize("CityOfMist.logger.action.changeActiveExtra");
+			const msg = localize("CityOfMist.logger.action.changeActiveExtra");
 			await CityLogger.modificationLog(this, msg, newExtra);
 		}
 	}
 
 	hasEntranceMoves() {
 		return this.getGMMoves()
-			.some ( x=> x.system.subtype == "entrance");
+			.some(x => x.system.subtype == "entrance");
 	}
 
-	async executeEntranceMoves(token : TokenDocument<Danger>) {
-		if (!game.user.isGM) {return;}
-		if (!CityHelpers.entranceMovesEnabled())
-			{return;}
-		const moves =	this.getGMMoves()
-			.filter ( x=> x.system.subtype == "entrance");
+	async executeEntranceMoves(token: TokenDocument<Danger>) {
+		if (!game.user.isGM) { return; }
+		if (!CityHelpers.entranceMovesEnabled()) { return; }
+		const moves = this.getGMMoves()
+			.filter(x => x.system.subtype == "entrance");
 		if (CityHelpers.autoExecEntranceMoves()
-			|| await HTMLTools.confirmBox(`Run enter Scene Moves for ${token.name}`, `Run Enter scene moves for ${token.name}`) ) {
+			|| await HTMLTools.confirmBox(`Run enter Scene Moves for ${token.name}`, `Run Enter scene moves for ${token.name}`)) {
 			for (const move of moves) {
 				await this.executeGMMove(move);
 			}
 		}
 	}
 
-	async executeGMMove (move: GMMove, actor ?: CityActor) {
-		const {taglist, statuslist, html} = await move.prepareToRenderGMMove(this);
+	async executeGMMove(move: GMMove, actor?: CityActor) {
+		const { taglist, statuslist, html } = await move.prepareToRenderGMMove(this);
 		const speaker = actor ? { alias: actor.getDisplayedName() } : {};
 		if (await CityHelpers.sendToChat(html, speaker)) {
 			await CityHelpers.processTextTagsStatuses(taglist, statuslist, this);
@@ -1355,14 +1608,12 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	async undoGMMove(this: Danger, move: GMMove) {
-		const {taglist, statuslist} = move.formatGMMoveText(this);
-		for (const {name: tagname} of taglist)
-			{await this.deleteStoryTagByName(tagname);}
-		for (const {name} of statuslist)
-			{await this.deleteStatusByName(name);}
+		const { taglist, statuslist } = move.formatGMMoveText(this);
+		for (const { name: tagname } of taglist) { await this.deleteStoryTagByName(tagname); }
+		for (const { name } of statuslist) { await this.deleteStatusByName(name); }
 	}
 
-	async addOrCreateStatus (name2: string, options: StatusCreationOptions) : Promise<Status> {
+	async addOrCreateStatus(name2: string, options: StatusCreationOptions): Promise<Status> {
 		const pips = options.pips ?? 0;
 		const tier2 = options.tier;
 		const status = this.hasStatus(name2);
@@ -1373,33 +1624,31 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		}
 	}
 
-	async undoEntranceMoves (this: Danger, token: TokenDocument<Danger>) {
-		if (!game.user.isGM) {return;}
-		if (!CityHelpers.entranceMovesEnabled())
-			{return;}
-		const moves =	this.getGMMoves()
-			.filter ( x=> x.system.subtype == "entrance");
+	async undoEntranceMoves(this: Danger, token: TokenDocument<Danger>) {
+		if (!game.user.isGM) { return; }
+		if (!CityHelpers.entranceMovesEnabled()) { return; }
+		const moves = this.getGMMoves()
+			.filter(x => x.system.subtype == "entrance");
 		if (CityHelpers.autoExecEntranceMoves()
-			|| await HTMLTools.confirmBox(`Undo Enter Scene Moves for ${token.name}`, `Undo Enter scene moves for ${token.name}`) ) {
+			|| await HTMLTools.confirmBox(`Undo Enter Scene Moves for ${token.name}`, `Undo Enter scene moves for ${token.name}`)) {
 			for (const move of moves) {
 				await this.undoGMMove(move);
 			}
 		}
 	}
 
-	async addTemplate(this: Danger, id :Danger["id"]) {
+	async addTemplate(this: Danger, id: Danger["id"]) {
 		this.system.template_ids.push(id);
-		return await this.update({ "system.template_ids": this.system.template_ids});
+		return await this.update({ "system.template_ids": this.system.template_ids });
 	}
 
 	async removeTemplate(this: Danger, id: string) {
-		const templates = this.system.template_ids.filter(x=> x != id);
-		return await this.update({ "system.template_ids": templates});
+		const templates = this.system.template_ids.filter(x => x != id);
+		return await this.update({ "system.template_ids": templates });
 	}
 
 	hasTemplate(this: Danger, id: Danger["id"]) {
-		if (!this?.system?.template_ids)
-			{return false;}
+		if (!this?.system?.template_ids) { return false; }
 		return this.system.template_ids.includes(id);
 	}
 
@@ -1411,7 +1660,7 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		const rolltype = move.system.subtype;
 		switch (rolltype) {
 			case "themeclassroll":
-				if (this.getNumberOfThemes(move.system.theme_class) == 0) {return false;}
+				if (this.getNumberOfThemes(move.system.theme_class) == 0) { return false; }
 				break;
 			case "noroll":
 			case "standard":
@@ -1422,30 +1671,27 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 				rolltype satisfies never;
 				throw new Error(`Unknown Move Type ${rolltype as string}`);
 		}
-		if (move.system.abbreviation == "FLASH" && !this.hasFlashbackAvailable())
-			{return false;}
-		if (move.hasEffectClass("MIST") && this.getNumberOfThemes("Mist") <=0)
-			{return false;}
-		if (move.hasEffectClass("MYTHOS") && this.getNumberOfThemes("Mythos") <=0)
-			{return false;}
+		if (move.system.abbreviation == "FLASH" && !this.hasFlashbackAvailable()) { return false; }
+		if (move.hasEffectClass("MIST") && this.getNumberOfThemes("Mist") <= 0) { return false; }
+		if (move.hasEffectClass("MYTHOS") && this.getNumberOfThemes("Mythos") <= 0) { return false; }
 		return true;
 	}
 
 	purgeInvalidItems() {
 		//@ts-expect-error invalid doc stuff which isn't a part of foundry types
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		const invalid:  string[] = Array.from(this.items.invalidDocumentIds);
+		const invalid: string[] = Array.from(this.items.invalidDocumentIds);
 		//@ts-expect-error invalid doc stuff which isn't a part of foundry types
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-		invalid.forEach( id=> this.items.getInvalid(id).delete());
+		invalid.forEach(id => this.items.getInvalid(id).delete());
 	}
 
-	async createLoadoutTheme() : Promise<Theme> {
-		const themebook= CityDB.getLoadoutThemebook();
+	async createLoadoutTheme(): Promise<Theme> {
+		const themebook = CityDB.getLoadoutThemebook();
 		if (!themebook) {
 			throw new Error("Can't create Loadout theme: No valid Loadout theme exists");
 		}
-		const system : Partial<Theme["system"]> = {
+		const system: Partial<Theme["system"]> = {
 			themebook_id: themebook.id,
 			themebook_name: themebook.name,
 			unspent_upgrades: 0,
@@ -1462,7 +1708,7 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 
 	async createLoadoutTag(this: PC) {
 		const theme = this.loadout;
-		if (!theme) {throw new Error(`Can't find Loadout Theme`);}
+		if (!theme) { throw new Error(`Can't find Loadout Theme`); }
 		const obj = {
 			name: "Unnamed Loadout Tag",
 			type: "tag",
@@ -1480,14 +1726,13 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 
 	async createLoadoutWeakness(this: PC, masterTagId: string) {
 		const theme = this.loadout;
-		if (!theme) {throw new Error(`Can't find Loadout Theme`);}
-		const masterTag = this.loadout.tags().find(x=> x.id == masterTagId);
-		if (!masterTag)
-			{throw new Error(`Can't find Master Tag: ${masterTagId}`);}
+		if (!theme) { throw new Error(`Can't find Loadout Theme`); }
+		const masterTag = this.loadout.tags().find(x => x.id == masterTagId);
+		if (!masterTag) { throw new Error(`Can't find Master Tag: ${masterTagId}`); }
 		const obj = {
 			name: "Unnamed Weakness Tag",
 			type: "tag",
-			system : {
+			system: {
 				subtype: "weakness",
 				crispy: false,
 				question_letter: "_",
@@ -1499,28 +1744,28 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 		return await this.createNewItem(obj) as Tag;
 	}
 
-	async toggleLoadoutTagActivation(this: PC, loadoutTagId: string) : Promise<boolean> {
+	async toggleLoadoutTagActivation(this: PC, loadoutTagId: string): Promise<boolean> {
 		const theme = this.loadout;
-		if (!theme) {throw new Error(`Can't find Loadout Theme`);}
-		const tag = theme.tags().find( x=> x.id == loadoutTagId);
-		if (!tag) {throw new Error(`No such tag exists on loadout theme with Id ${loadoutTagId}`);}
+		if (!theme) { throw new Error(`Can't find Loadout Theme`); }
+		const tag = theme.tags().find(x => x.id == loadoutTagId);
+		if (!tag) { throw new Error(`No such tag exists on loadout theme with Id ${loadoutTagId}`); }
 		return await tag.toggleLoadoutActivation();
 	}
 
 	async setEssence(this: PC, essence: Essence) {
 		if (essence.systemName) {
-			await this.update( {"system.essence.systemName" : essence.systemName});
+			await this.update({ "system.essence.systemName": essence.systemName });
 		} else {
-			await this.update( {"system.essence.systemName" : essence.id});
+			await this.update({ "system.essence.systemName": essence.id });
 		}
 		return this;
 	}
 
-	async setEssenceBurn(this: PC, val : boolean, sound= true){
+	async setEssenceBurn(this: PC, val: boolean, sound = true) {
 		if (val && !this.system.essence.isBurned && sound) {
 			void CityHelpers.playBurn();
 		}
-		await this.update( {"system.essence.isBurned": val});
+		await this.update({ "system.essence.isBurned": val });
 	}
 
 
@@ -1538,14 +1783,14 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	async clearEssence(this: PC) {
-		await this.update( {"system.essence" : ""});
+		await this.update({ "system.essence": "" });
 		return this;
 	}
 
-	get essence() : Essence | undefined {
-		if (this.system.type != "character") {return undefined;}
+	get essence(): Essence | undefined {
+		if (this.system.type != "character") { return undefined; }
 		const ess = CityDB.getEssenceBySystemName(this.system.essence.systemName);
-		if (ess) {return ess;}
+		if (ess) { return ess; }
 		return CityDB.getEssence(this.system.essence.systemName);
 	}
 
