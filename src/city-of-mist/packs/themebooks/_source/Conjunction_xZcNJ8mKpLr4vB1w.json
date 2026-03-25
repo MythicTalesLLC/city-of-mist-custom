@@ -1,128 +1,128 @@
 {
-  "_id": "xZcNJ8mKpLr4vB1w",
-  "name": "Conjunction",
-  "type": "themebook",
-  "img": "icons/svg/mystery-man.svg",
-  "effects": [],
-  "folder": "7ji0PqBuZO78BzmB",
-  "sort": 100000,
-  "flags": {},
-  "system": {
-    "description": "",
-    "locked": false,
-    "version": "2.4.5",
-    "free_content": true,
-    "locale_name": "#CityOfMist.themebook.conjunction.name",
-    "type": "Logos",
-    "power_questions": {
-      "A": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      },
-      "B": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      },
-      "C": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      },
-      "D": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      },
-      "E": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      },
-      "F": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      },
-      "G": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      },
-      "H": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      },
-      "I": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      },
-      "J": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      }
+    "_id": "xZcNJ8mKpLr4vB1w",
+    "name": "Conjunction",
+    "type": "themebook",
+    "img": "icons/svg/mystery-man.svg",
+    "effects": [],
+    "folder": "7ji0PqBuZO78BzmB",
+    "sort": 100000,
+    "flags": {},
+    "system": {
+        "description": "",
+        "locked": false,
+        "version": "2.4.5",
+        "free_content": true,
+        "locale_name": "#CityOfMist.themebook.conjunction.name",
+        "type": "Logos",
+        "power_questions": {
+            "A": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            },
+            "B": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            },
+            "C": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            },
+            "D": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            },
+            "E": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            },
+            "F": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            },
+            "G": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            },
+            "H": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            },
+            "I": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            },
+            "J": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            }
+        },
+        "weakness_questions": {
+            "A": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            },
+            "B": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            },
+            "C": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            },
+            "D": {
+                "question": "#CityOfMist.themebook.conjunction.reference",
+                "subtag": false
+            }
+        },
+        "improvements": {
+            "0": {
+                "name": "#CityOfMist.themebook.conjunction.imp.0.name",
+                "description": "#CityOfMist.themebook.conjunction.reference",
+                "uses": null,
+                "effect_class": ""
+            },
+            "1": {
+                "name": "#CityOfMist.themebook.conjunction.imp.1.name",
+                "description": "#CityOfMist.themebook.conjunction.reference",
+                "uses": null,
+                "effect_class": ""
+            },
+            "2": {
+                "name": "#CityOfMist.themebook.conjunction.imp.2.name",
+                "description": "#CityOfMist.themebook.conjunction.reference",
+                "uses": null,
+                "effect_class": ""
+            },
+            "3": {
+                "name": "#CityOfMist.themebook.conjunction.imp.3.name",
+                "description": "#CityOfMist.themebook.conjunction.reference",
+                "uses": null,
+                "effect_class": ""
+            },
+            "4": {
+                "name": "#CityOfMist.themebook.conjunction.imp.4.name",
+                "description": "#CityOfMist.themebook.conjunction.reference",
+                "uses": null,
+                "effect_class": ""
+            }
+        },
+        "motivation": "identity",
+        "system_compatiblity": "city-of-mist",
+        "systemName": "Conjunction"
     },
-    "weakness_questions": {
-      "A": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      },
-      "B": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      },
-      "C": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      },
-      "D": {
-        "question": "#CityOfMist.themebook.conjunction.reference",
-        "subtag": false
-      }
+    "ownership": {
+        "default": 0
     },
-    "improvements": {
-      "0": {
-        "name": "#CityOfMist.themebook.conjunction.imp.0.name",
-        "description": "#CityOfMist.themebook.conjunction.reference",
-        "uses": null,
-        "effect_class": ""
-      },
-      "1": {
-        "name": "#CityOfMist.themebook.conjunction.imp.1.name",
-        "description": "#CityOfMist.themebook.conjunction.reference",
-        "uses": null,
-        "effect_class": ""
-      },
-      "2": {
-        "name": "#CityOfMist.themebook.conjunction.imp.2.name",
-        "description": "#CityOfMist.themebook.conjunction.reference",
-        "uses": null,
-        "effect_class": ""
-      },
-      "3": {
-        "name": "#CityOfMist.themebook.conjunction.imp.3.name",
-        "description": "#CityOfMist.themebook.conjunction.reference",
-        "uses": null,
-        "effect_class": ""
-      },
-      "4": {
-        "name": "#CityOfMist.themebook.conjunction.imp.4.name",
-        "description": "#CityOfMist.themebook.conjunction.reference",
-        "uses": null,
-        "effect_class": ""
-      }
+    "_stats": {
+        "systemId": "city-of-mist",
+        "systemVersion": "3.1.4",
+        "coreVersion": "13.345",
+        "createdTime": null,
+        "modifiedTime": null,
+        "lastModifiedBy": null,
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null
     },
-    "motivation": "identity",
-    "system_compatiblity": "city-of-mist",
-    "systemName": "Conjunction"
-  },
-  "ownership": {
-    "default": 0
-  },
-  "_stats": {
-    "systemId": "city-of-mist",
-    "systemVersion": "3.1.4",
-    "coreVersion": "13.345",
-    "createdTime": null,
-    "modifiedTime": null,
-    "lastModifiedBy": null,
-    "compendiumSource": null,
-    "duplicateSource": null,
-    "exportSource": null
-  },
-  "_key": "!items!xZcNJ8mKpLr4vB1w"
+    "_key": "!items!xZcNJ8mKpLr4vB1w"
 }
