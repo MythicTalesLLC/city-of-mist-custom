@@ -14,6 +14,25 @@
 
 This is the unofficial Foundry System for City of Mist RPG by Son of Oak.
 
+## Install On FoundryServer
+
+Use this manifest URL when adding the system by manifest:
+
+`https://raw.githubusercontent.com/MythicTalesLLC/city-of-mist-custom/main/system.json`
+
+This manifest expects a release asset at:
+
+`https://github.com/MythicTalesLLC/city-of-mist-custom/releases/download/v4.2.3/city-of-mist-custom.zip`
+
+To publish a release that Foundry and FoundryServer can install:
+
+1. Run `npm run package`
+2. Create a GitHub release with tag `v4.2.3`
+3. Upload `release/city-of-mist-custom.zip` as a release asset
+4. Push `main` so the manifest URL serves the updated `system.json`
+
+Foundry installs from a manifest by fetching the `download` URL from `system.json`, so both the manifest URL and the zip asset must be publicly reachable.
+
 ### Features
 
 * Ability to select tags, statuses and story tags for moves. Will automatically burn crew or extra tags if used. 

@@ -9,8 +9,8 @@
 			"flags": {}
 		}
 	],
-	"url": "https://github.com/taragnor/city-of-mist/",
-	"version": "4.2.2",
+	"url": "https://github.com/MythicTalesLLC/city-of-mist-custom",
+	"version": "4.2.3",
 	"compatibility": {
 		"minimum": "13",
 		"verified": "13.351",
@@ -18,100 +18,99 @@
 	},
 	"esmodules": [
 		"module/city.js"
-  ],
-  "styles": [
-	  "styles/city.css",
-	  "module/token-tooltip/tooltip.css",
-	  "module/city-status-tracker/city-status-tracker.css",
-	  "styles/com.css",
-	  "styles/otherscape.css",
-	  "styles/legend.css",
-	  "styles/mist-engine.css"
-  ],
-  "languages": [
-	  {
-		  "lang": "en",
-		  "name": "English",
-		  "path": "lang/en.json",
-		  "flags": {}
-	  },
-	  {
-		  "lang": "de",
-		  "name": "German",
-		  "path": "lang/de.json",
-		  "flags": {}
-	  },
-	  {
-		  "lang": "pl",
-		  "name": "Polish",
-		  "path": "lang/pl.json",
-		  "flags": {}
-	  },
-	  {
-		  "lang": "pt-BR",
-		  "name": "Português (Brasil)",
-		  "path": "lang/pt-br.json",
-		  "flags": {}
-	  },
-	  {
-		  "lang": "fr",
-		  "name": "French",
-		  "path": "lang/fr.json",
-		  "flags": {}
-	  },
-	  {
-		  "lang": "it",
-		  "name": "Italian",
-		  "path": "lang/it.json",
-		  "flags": {}
-	  },
-	  {
-		  "lang": "es",
-		  "name": "Español (placeholder)",
-		  "path": "lang/es.json",
-		  "flags": {}
-	  }
-
-  ],
-  "packs": [
-    {
-      "name": "themebook",
-      "label": "CoM Data",
-      "system": "city-of-mist",
-      "path": "packs/themebooks",
-      "type": "Item",
-      "private": false,
-      "flags": {}
-    },
-    {
-      "name": "sampleDangers",
-      "label": "Sample Dangers",
-      "system": "city-of-mist",
-      "path": "packs/sampledangers",
-      "type": "Actor",
-      "private": false,
-      "flags": {}
-    },
-    {
-      "name": "macro",
-      "label": "Macros",
-      "system": "city-of-mist",
-      "path": "packs/macro",
-      "type": "Macro",
-      "private": false,
-      "flags": {}
-    },
-    {
-      "name": "journal",
-      "label": "CoM/Mist System Documentation",
-      "system": "city-of-mist",
-      "path": "packs/documentation",
-      "type": "JournalEntry",
-      "private": false,
-      "flags": {}
-    }
-  ],
-  "socket": true,
-  "manifest": "https://raw.githubusercontent.com/taragnor/city-of-mist/main/system.json",
-  "download": "https://github.com/taragnor/city-of-mist/releases/download/v.4.2.2/city-of-mist.zip"
+	],
+	"styles": [
+		"styles/city.css",
+		"module/token-tooltip/tooltip.css",
+		"module/city-status-tracker/city-status-tracker.css",
+		"styles/com.css",
+		"styles/otherscape.css",
+		"styles/legend.css",
+		"styles/mist-engine.css"
+	],
+	"languages": [
+		{
+			"lang": "en",
+			"name": "English",
+			"path": "lang/en.json",
+			"flags": {}
+		},
+		{
+			"lang": "de",
+			"name": "German",
+			"path": "lang/de.json",
+			"flags": {}
+		},
+		{
+			"lang": "pl",
+			"name": "Polish",
+			"path": "lang/pl.json",
+			"flags": {}
+		},
+		{
+			"lang": "pt-BR",
+			"name": "Português (Brasil)",
+			"path": "lang/pt-br.json",
+			"flags": {}
+		},
+		{
+			"lang": "fr",
+			"name": "French",
+			"path": "lang/fr.json",
+			"flags": {}
+		},
+		{
+			"lang": "it",
+			"name": "Italian",
+			"path": "lang/it.json",
+			"flags": {}
+		},
+		{
+			"lang": "es",
+			"name": "Español (placeholder)",
+			"path": "lang/es.json",
+			"flags": {}
+		}
+	],
+	"packs": [
+		{
+			"name": "themebook",
+			"label": "CoM Data",
+			"system": "city-of-mist",
+			"path": "packs/themebooks",
+			"type": "Item",
+			"private": false,
+			"flags": {}
+		},
+		{
+			"name": "sampleDangers",
+			"label": "Sample Dangers",
+			"system": "city-of-mist",
+			"path": "packs/sampledangers",
+			"type": "Actor",
+			"private": false,
+			"flags": {}
+		},
+		{
+			"name": "macro",
+			"label": "Macros",
+			"system": "city-of-mist",
+			"path": "packs/macro",
+			"type": "Macro",
+			"private": false,
+			"flags": {}
+		},
+		{
+			"name": "journal",
+			"label": "CoM/Mist System Documentation",
+			"system": "city-of-mist",
+			"path": "packs/documentation",
+			"type": "JournalEntry",
+			"private": false,
+			"flags": {}
+		}
+	],
+	"socket": true,
+	"manifest": "https://raw.githubusercontent.com/MythicTalesLLC/city-of-mist-custom/main/system.json",
+	"download": "https://github.com/MythicTalesLLC/city-of-mist-custom/releases/download/v4.2.3/city-of-mist-custom.zip"
 }
