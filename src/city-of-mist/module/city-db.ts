@@ -111,14 +111,44 @@ export class CityDB extends DBAccessor {
 		));
 	}
 
+	static pickPreferredThemebook(themebooks: Themebook[]): Themebook | undefined {
+		if (themebooks.some(x => !x.system.free_content)) {
+			return themebooks.find(x => !x.system.free_content);
+		}
+		return themebooks[0];
+	}
+
 	static getLoadoutThemebook(): Themebook | undefined {
-		const themebooks = this.themebooks.filter(x =>
-			SystemModule.isLoadoutThemeType(x.system.subtype)
-			&& x.isSystemCompatible(CitySettings.getBaseSystem())
+		const configuredSystem = CitySettings.getBaseSystem() || SystemModule.active.name;
+		const activeSystem = SystemModule.active.name;
+		const allThemebooks = this._allThemebooks.length
+			? this._allThemebooks
+			: this.filterItemsByType("themebook") as Themebook[];
+		const loadoutTypes = new Set(
+			Object.entries(SystemModule.active.themeTypes())
+				.filter(([_name, info]) => info?.specials?.includes("loadout"))
+				.map(([name]) => name)
 		);
-		if (themebooks.some(x => !x.system.free_content)) { return themebooks.filter(x => !x.system.free_content)[0]; }
-		if (themebooks.length) { return themebooks[0]; }
-		else { return undefined; }
+
+		const subtypeMatches = allThemebooks.filter(themebook =>
+			loadoutTypes.has(themebook.system.subtype)
+		);
+		const configuredMatches = subtypeMatches.filter(themebook =>
+			themebook.isSystemCompatible(configuredSystem)
+		);
+		const activeMatches = subtypeMatches.filter(themebook =>
+			themebook.isSystemCompatible(activeSystem)
+		);
+		const namedMatches = allThemebooks.filter(themebook =>
+			themebook.system.systemName == "Loadout"
+			|| themebook.name == "Loadout"
+			|| themebook.system.subtype.toLowerCase().includes("loadout")
+		);
+
+		return this.pickPreferredThemebook(configuredMatches)
+			?? this.pickPreferredThemebook(activeMatches)
+			?? this.pickPreferredThemebook(subtypeMatches)
+			?? this.pickPreferredThemebook(namedMatches);
 	}
 
 	static loadMovesOfType(movetype: Move["system"]["category"]) {
