@@ -361,11 +361,11 @@ export class CityHandlebarsHelpers extends HandlebarsHelpers {
 		},
 
 		'isVeteranTheme': function (actor: CityActor, theme: Theme | undefined): boolean {
-			return actor.isVeteranTheme(theme);
+			return actor?.isVeteranTheme(theme) ?? false;
 		},
 
 		'isVeteranSlot': function (actor: CityActor, slotIndex: number): boolean {
-			return actor.isVeteranSlot(slotIndex);
+			return actor?.isVeteranSlot(slotIndex) ?? false;
 		},
 
 		'showVeteranThemeToggle': function (sheetowner: CityActor, owner: CityActor, theme: Theme, themetype: string): boolean {
