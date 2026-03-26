@@ -1687,6 +1687,7 @@ export class CityActor extends Actor<typeof ACTORMODELS, CityItem, ActiveEffect<
 	}
 
 	async createLoadoutTheme(): Promise<Theme> {
+		await CityDB.waitUntilLoaded();
 		const themebook = CityDB.getLoadoutThemebook();
 		if (!themebook) {
 			throw new Error("Can't create Loadout theme: No valid Loadout theme exists");

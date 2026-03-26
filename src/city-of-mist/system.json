@@ -10,7 +10,7 @@
 		}
 	],
 	"url": "https://github.com/MythicTalesLLC/city-of-mist-custom",
-	"version": "4.2.5",
+	"version": "4.2.6",
 	"compatibility": {
 		"minimum": "13",
 		"verified": "13.351",
@@ -112,5 +112,5 @@
 	],
 	"socket": true,
 	"manifest": "https://raw.githubusercontent.com/MythicTalesLLC/city-of-mist-custom/main/system.json",
-	"download": "https://github.com/MythicTalesLLC/city-of-mist-custom/releases/download/v4.2.5/city-of-mist-ii.zip"
+	"download": "https://github.com/MythicTalesLLC/city-of-mist-custom/releases/download/v4.2.6/city-of-mist-ii.zip"
 }

@@ -44,6 +44,7 @@ export class CityCharacterSheet extends CityActorSheet {
 	}
 
 	override async getData() {
+		await CityDB.waitUntilLoaded();
 		const data = await super.getData();
 		let loadoutTheme = this.actor.loadout;
 		if (!loadoutTheme && this.actor.isOwner) {
